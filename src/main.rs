@@ -86,13 +86,15 @@ fn setup(
             ..default()
         });
     }
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Cuboid::new(40.0, 1.0, 150.0)),
-        material: stone.clone(),
-        transform: Transform::from_xyz(0.0, 20.0, 45.0),
-        ..default()
-    });
-
+    // roofs
+    for y in &[13.0, 20.0] {
+        commands.spawn(PbrBundle {
+            mesh: meshes.add(Cuboid::new(40.0, 1.0, 150.0)),
+            material: stone.clone(),
+            transform: Transform::from_xyz(0.0, *y, 45.0),
+            ..default()
+        });
+    }
 
     commands.spawn(PointLightBundle {
         point_light: PointLight {
@@ -112,7 +114,7 @@ fn setup(
             cull_mode: None,
             ..default()
         }),
-        transform: Transform::from_scale(Vec3::splat(1_000_000.0)),
+        transform: Transform::from_scale(Vec3::splat(1_000.0)),
         ..default()
     });
 
@@ -147,7 +149,7 @@ fn setup(
         ))
         .with_children(|parent| {
             parent.spawn(TextBundle::from_section(
-                "Decent",
+                "...Decent",
                 TextStyle {
                     font_size: 20.,
                     ..default()
