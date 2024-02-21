@@ -46,8 +46,14 @@ fn add_new_laxers(
     for (_, l) in q.iter() {
         cmds.spawn((
             PbrBundle {
-                mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(0.1, 0.1, 0.5)})),
-                material: materials.add(Color::rgb_u8(255, 255, 0)),
+                mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(0.15, 0.15, 2.8)})),
+               // material: materials.add(Color::rgb_u8(255, 255, 0)),
+                material: materials.add(StandardMaterial {
+                    base_color: Color::hex("ff00ff").unwrap(),
+                    unlit: true,
+                    ..default()
+                }),
+
                 transform: Transform::from_translation(l.pos).with_rotation(l.dir),
                 ..default()
             },
@@ -62,7 +68,7 @@ fn update_laxers (
     mut q: Query<(Entity, &mut Transform, &mut LaxerFly)>) {
     for (e, mut t, mut l) in q.iter_mut() {
         let fwd = t.forward();
-        t.translation += fwd * 1.0;
+        t.translation += fwd * 200.0 * time.delta_seconds();
         l.time -= time.elapsed_seconds();
         if l.time <= 0.0 {
             cmds.entity(e).despawn();
