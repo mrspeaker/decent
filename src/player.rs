@@ -73,7 +73,6 @@ fn update_player(
         }
 
         if mouse_buttons.just_pressed(MouseButton::Left) {
-            info!("bank");
             cmds.spawn(Laxer::new(t.translation, t.rotation));
         }
     }
