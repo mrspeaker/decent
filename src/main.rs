@@ -1,13 +1,15 @@
 mod camera;
 mod player;
 mod physics;
+mod laxer;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
 use player::PlayerPlugin;
 use physics::PhysicsPlugin;
-use rand::Rng;
+use laxer::LaxerPlugin;
 
+use rand::Rng;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 
 fn main() {
@@ -15,6 +17,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(CameraPlugin)
         .add_plugins(PlayerPlugin)
+        .add_plugins(LaxerPlugin)
         .add_plugins(PhysicsPlugin)
         .add_systems(Startup, setup)
         .add_systems(Startup, cursor_grab)

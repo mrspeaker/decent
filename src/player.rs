@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
 use crate::physics::{Velocity, Acceleration, Impulse, Torque, TorquePhysics};
+use crate::laxer::Laxer;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -31,6 +33,7 @@ fn update_player(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
     mut mouse_events: EventReader<MouseMotion>,
+    mut mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut q: Query<(Entity, &mut Transform), With<Player>>)
 {
     let speed = 5.0;
@@ -67,6 +70,11 @@ fn update_player(
             cmds
                 .entity(ent)
                 .insert(Impulse (imp * speed * dt));
+        }
+
+        if mouse_buttons.just_pressed(MouseButton::Left) {
+            info!("bank");
+            cmds.spawn(Laxer::new(t.translation, t.rotation));
         }
     }
 }
