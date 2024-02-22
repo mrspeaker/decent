@@ -64,7 +64,6 @@ fn apply_torque(
     }
 }
 
-
 fn integrate(time: Res<Time>, mut q:Query<(&mut Transform, &mut Velocity, &mut Acceleration, &mut TorquePhysics)>) {
     for (mut t, mut vel, mut acc, mut tphys) in q.iter_mut() {
         // Translation

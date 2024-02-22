@@ -110,14 +110,14 @@ fn setup(
     // walls
     for x in &[-20., 20.] {
         commands.spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(0.5, 20.0, 150.0)),
+            mesh: meshes.add(Cuboid::new(0.5, 13.0, 150.0)),
             material: stone.clone(),
-            transform: Transform::from_xyz(*x, 10., 75.0),
+            transform: Transform::from_xyz(*x, 13.0/2.0, 75.0),
             ..default()
         });
     }
     // roofs
-    for y in &[-0.255, 13.0, 20.0] {
+    for y in &[-0.255, 13.0] {
         commands.spawn(PbrBundle {
             mesh: meshes.add(Cuboid::new(40.0, 0.5, 150.0)),
             material: stone.clone(),
@@ -240,48 +240,6 @@ fn cursor_ungrab(
 fn draw_gizmos(
     mut gizmos: Gizmos,
 ) {
-    /*
-    gizmos.cuboid(
-        Transform::from_translation(Vec3::Y * 0.5).with_scale(Vec3::splat(1.25)),
-        Color::BLACK,
-    );
-    gizmos.rect(
-        Vec3::new(time.elapsed_seconds().cos() * 2.5, 1., 0.),
-        Quat::from_rotation_y(PI / 2.),
-        Vec2::splat(2.),
-        Color::GREEN,
-    );
-
-    my_gizmos.sphere(Vec3::new(1., 0.5, 0.), Quat::IDENTITY, 0.5, Color::RED);
-
-    for y in [0., 0.5, 1.] {
-        gizmos.ray(
-            Vec3::new(1., y, 0.),
-            Vec3::new(-3., (time.elapsed_seconds() * 3.).sin(), 0.),
-            Color::BLUE,
-        );
-    }
-
-    my_gizmos
-        .arc_3d(
-            180.0_f32.to_radians(),
-            0.2,
-            Vec3::ONE,
-            Quat::from_rotation_arc(Vec3::Y, Vec3::ONE.normalize()),
-            Color::ORANGE,
-        )
-        .segments(10);
-
-    // Circles have 32 line-segments by default.
-    my_gizmos.circle(Vec3::ZERO, Direction3d::Y, 3., Color::BLACK);
-    // You may want to increase this for larger circles or spheres.
-    my_gizmos
-        .circle(Vec3::ZERO, Direction3d::Y, 3.1, Color::NAVY)
-        .segments(64);
-    my_gizmos
-        .sphere(Vec3::ZERO, Quat::IDENTITY, 3.2, Color::BLACK)
-        .circle_segments(64);
-     */
     gizmos.arrow(Vec3::ZERO, Vec3::Y * 1.0, Color::BLUE);
     gizmos.arrow(Vec3::ZERO, Vec3::X * 1.0, Color::RED);
     gizmos.arrow(Vec3::ZERO, Vec3::Z * 1.0, Color::GREEN);

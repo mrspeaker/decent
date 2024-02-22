@@ -25,6 +25,7 @@ fn check_collisions (
             if lt.translation.distance(tt.translation) < 2.5 {
                 cmds.entity(te).despawn();
                 cmds.entity(le).despawn_recursive();
+                continue;
             }
         }
     }

@@ -58,7 +58,7 @@ fn add_new_laxers(
             .with_children(|parent| {
                 for x in &[-1.0, 1.0] {
                     parent.spawn(PbrBundle {
-                        mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(0.15, 0.15, 2.8)})),
+                        mesh: meshes.add(Mesh::from(Cuboid::new(0.1, 0.1, 4.0))),
                         material: materials.add(StandardMaterial {
                             base_color: Color::hex("ff00ff").unwrap(),
                             unlit: true,

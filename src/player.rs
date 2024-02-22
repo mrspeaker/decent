@@ -8,7 +8,10 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, init_player);
-        app.add_systems(Update, update_player);
+        app.add_systems(Update, (
+            update_player,
+            auto_level
+        ));
     }
 }
 
@@ -20,7 +23,7 @@ fn init_player(mut cmds: Commands) {
     //tp.spin(3.1415);
 
     cmds.spawn((
-        Transform::from_xyz(0.0, 0.0, 6.0),
+        Transform::from_xyz(0.0, 8.0, 200.0),
         Player,
         Velocity(Vec3::ZERO),
         Acceleration(Vec3::ZERO),
@@ -44,8 +47,8 @@ fn update_player(
         let mut rot = Vec3::ZERO;
 
         // Manual roll
-        if keys.pressed(KeyCode::KeyZ) { rot.z = speed; }
-        if keys.pressed(KeyCode::KeyC) { rot.z = -speed; }
+        if keys.pressed(KeyCode::KeyZ) { rot.z = speed * 4.0; }
+        if keys.pressed(KeyCode::KeyC) { rot.z = -speed * 4.0; }
 
         for event in mouse_events.read() {
             rot.x = -event.delta.y; // Pitch
@@ -75,5 +78,15 @@ fn update_player(
         if mouse_buttons.just_pressed(MouseButton::Left) {
             cmds.spawn(Laxer::new(t.translation + t.forward() * 2.0, t.rotation));
         }
+    }
+}
+
+
+fn auto_level(
+    mut gizmos: Gizmos,
+    mut q: Query<&mut Transform, With<Player>>
+) {
+    if let Ok(t) = q.get_single_mut() {
+        gizmos.arrow(Vec3::ZERO, t.rotation.to_axis_angle().0, Color::YELLOW);
     }
 }
