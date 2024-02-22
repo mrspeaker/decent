@@ -10,7 +10,7 @@ pub struct LaxerFly {
 impl LaxerFly {
     pub fn new() -> Self {
         Self {
-            time: 2000.0
+            time: 2.0
         }
     }
 }
@@ -46,21 +46,29 @@ fn add_new_laxers(
     mut materials: ResMut<Assets<StandardMaterial>>,
     q: Query<(Entity, &Laxer), Added<Laxer>>) {
     for (_, l) in q.iter() {
-        cmds.spawn((
-            PbrBundle {
-                mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(0.15, 0.15, 2.8)})),
-               // material: materials.add(Color::rgb_u8(255, 255, 0)),
-                material: materials.add(StandardMaterial {
-                    base_color: Color::hex("ff00ff").unwrap(),
-                    unlit: true,
+        let t = Transform::from_translation(l.pos).with_rotation(l.dir);
+        cmds.spawn(
+            (
+                LaxerFly::new(),
+                SpatialBundle {
+                    transform: t,
                     ..default()
-                }),
-
-                transform: Transform::from_translation(l.pos).with_rotation(l.dir),
-                ..default()
-            },
-            LaxerFly::new()
-        ));
+                }
+            ))
+            .with_children(|parent| {
+                for x in &[-1.0, 1.0] {
+                    parent.spawn(PbrBundle {
+                        mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(0.15, 0.15, 2.8)})),
+                        material: materials.add(StandardMaterial {
+                            base_color: Color::hex("ff00ff").unwrap(),
+                            unlit: true,
+                            ..default()
+                        }),
+                        transform: Transform::default().with_translation(t.right() * *x),
+                        ..default()
+                    });
+                }
+            });
     }
 }
 
@@ -71,9 +79,9 @@ fn update_laxers (
     for (e, mut t, mut l) in q.iter_mut() {
         let fwd = t.forward();
         t.translation += fwd * 200.0 * time.delta_seconds();
-        l.time -= time.elapsed_seconds();
+        l.time -= time.delta_seconds();
         if l.time <= 0.0 {
-            cmds.entity(e).despawn();
+            cmds.entity(e).despawn_recursive();
         }
     }
 }

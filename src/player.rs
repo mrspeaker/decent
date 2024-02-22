@@ -73,8 +73,7 @@ fn update_player(
         }
 
         if mouse_buttons.just_pressed(MouseButton::Left) {
-            cmds.spawn(Laxer::new(t.translation + t.forward() * 2.0 + t.left() * 1.0, t.rotation));
-            cmds.spawn(Laxer::new(t.translation + t.forward() * 2.0 + t.right() * 1.0, t.rotation));
+            cmds.spawn(Laxer::new(t.translation + t.forward() * 2.0, t.rotation));
         }
     }
 }

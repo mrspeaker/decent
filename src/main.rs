@@ -2,17 +2,21 @@ mod camera;
 mod player;
 mod physics;
 mod laxer;
+mod target;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
 use player::PlayerPlugin;
 use physics::PhysicsPlugin;
 use laxer::LaxerPlugin;
+use target::TargetPlugin;
 
 use rand::Rng;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use bevy::pbr::NotShadowCaster;
 use std::f32::consts::PI;
+
+use crate::target::Target;
 
 fn main() {
     App::new()
@@ -21,6 +25,7 @@ fn main() {
             CameraPlugin,
             PlayerPlugin,
             LaxerPlugin,
+            TargetPlugin,
             PhysicsPlugin
         ))
         .add_systems(Startup, (setup, cursor_grab))
@@ -77,20 +82,23 @@ fn setup(
     // Floaty cube things
     let mut rng = rand::thread_rng();
     for _ in 1..100 {
-        commands.spawn(PbrBundle {
+        commands.spawn((
+            PbrBundle {
                 mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(
                     rng.gen::<f32>() * 1.0 + 0.1,
                     rng.gen::<f32>() * 0.3 + 0.01,
                     rng.gen::<f32>() * 0.6 + 0.03
                 )})),
-            material: materials.add(Color::rgb_u8(255, 144, 55)),
-            transform: Transform::from_xyz(
-                rng.gen::<f32>() * 30.0 - 15.0,
-                rng.gen::<f32>() * 10.0,
-                rng.gen::<f32>() * 200.0 - 100.0
-            ),
-            ..default()
-        });
+                material: materials.add(Color::rgb_u8(255, 144, 55)),
+                transform: Transform::from_xyz(
+                    rng.gen::<f32>() * 30.0 - 15.0,
+                    rng.gen::<f32>() * 10.0,
+                    rng.gen::<f32>() * 200.0 - 100.0
+                ),
+                ..default()
+            },
+            Target
+        ));
     }
 
     let stone = materials.add(StandardMaterial {
