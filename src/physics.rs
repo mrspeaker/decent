@@ -75,8 +75,8 @@ fn integrate(time: Res<Time>, mut q:Query<(&mut Transform, &mut Velocity, &mut A
         // Bob.
         let up = t.up();
         t.translation += vel.0 + (up * 0.005 * (time.elapsed_seconds() * 3.0).sin());
-        if t.translation.y < 2.0 {
-            t.translation.y = 2.0;
+        if t.translation.y < 1.2 {
+            t.translation.y = 1.2;
         }
 
         // Rotation

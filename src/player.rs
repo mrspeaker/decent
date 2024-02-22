@@ -16,11 +16,11 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 fn init_player(mut cmds: Commands) {
-    let mut tp = TorquePhysics::new();
-    tp.spin(3.1415);
+    let tp = TorquePhysics::new();
+    //tp.spin(3.1415);
 
     cmds.spawn((
-        Transform::from_xyz(0.0, 4.5, -9.0),
+        Transform::from_xyz(0.0, 0.0, 6.0),
         Player,
         Velocity(Vec3::ZERO),
         Acceleration(Vec3::ZERO),
@@ -69,7 +69,7 @@ fn update_player(
         if imp.length() > 0.0 {
             cmds
                 .entity(ent)
-                .insert(Impulse (imp * speed * dt));
+                .insert(Impulse (imp.normalize() * speed * dt));
         }
 
         if mouse_buttons.just_pressed(MouseButton::Left) {

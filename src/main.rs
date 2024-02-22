@@ -24,7 +24,7 @@ fn main() {
             PhysicsPlugin
         ))
         .add_systems(Startup, (setup, cursor_grab))
-        .add_systems(Update, cursor_ungrab)
+        .add_systems(Update, (cursor_ungrab, draw_gizmos))
         .run();
 }
 
@@ -34,13 +34,14 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
+    // Terrain
     commands.spawn(SceneBundle {
         scene: assets.load("mountains.gltf#Scene0"),
         transform: Transform::from_xyz(0.,0.,-150.).with_scale(Vec3::ONE * 1000.0),
         ..default()
     });
 
+    // Sun
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             illuminance: light_consts::lux::OVERCAST_DAY,
@@ -56,60 +57,74 @@ fn setup(
     });
 
 
+    // Ground plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(50.0, 350.0)),
-        material: materials.add(Color::rgb(1., 0.9, 0.9)),
+        mesh: meshes.add(Plane3d::default().mesh().size(3.5, 350.0)),
+        material: materials.add(Color::rgb(1., 0.9, 0.8)),
         transform: Transform::from_translation(Vec3::new(0., 0., 0.0)),
         ..Default::default()
     });
 
+    let h = 1.75;
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(Cuboid::new(0.5, h, 0.4))),
+        material: materials.add(Color::rgb_u8(255, 244, 255)),
+        transform: Transform::from_xyz(0., h / 2.0, -0.5),
+        ..default()
+    });
+
+
+    // Floaty cube things
     let mut rng = rand::thread_rng();
     for _ in 1..100 {
-        let x: f32 = rng.gen();
-        let xx = x * 30.0 -15.0;
-        let y: f32 = rng.gen();
-        let yy = y * 10.0;
-        let z: f32 = rng.gen();
-        let zz = z * 200. - 100.0;
         commands.spawn(PbrBundle {
-            mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(1.0, 0.1, 0.3)})),
-            material: materials.add(Color::rgb_u8(124, 144, 255)),
-            transform: Transform::from_xyz(xx, yy, zz),
+                mesh: meshes.add(Mesh::from(Cuboid {half_size: Vec3::new(
+                    rng.gen::<f32>() * 1.0 + 0.1,
+                    rng.gen::<f32>() * 0.3 + 0.01,
+                    rng.gen::<f32>() * 0.6 + 0.03
+                )})),
+            material: materials.add(Color::rgb_u8(255, 144, 55)),
+            transform: Transform::from_xyz(
+                rng.gen::<f32>() * 30.0 - 15.0,
+                rng.gen::<f32>() * 10.0,
+                rng.gen::<f32>() * 200.0 - 100.0
+            ),
             ..default()
         });
     }
 
     let stone = materials.add(StandardMaterial {
-        base_color: Color::hex("68625B").unwrap(),
+        base_color: Color::hex("4b3621").unwrap(),
         perceptual_roughness: 0.8,
         ..default()
     });
 
-    // pillars
-    for (x, z) in &[(-20., 50.), (20., 50.)] {
+    // walls
+    for x in &[-20., 20.] {
         commands.spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 20.0, 150.0)),
+            mesh: meshes.add(Cuboid::new(0.5, 20.0, 150.0)),
             material: stone.clone(),
-            transform: Transform::from_xyz(*x, 10., *z),
+            transform: Transform::from_xyz(*x, 10., 75.0),
             ..default()
         });
     }
     // roofs
-    for y in &[13.0, 20.0] {
+    for y in &[-0.255, 13.0, 20.0] {
         commands.spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(40.0, 1.0, 150.0)),
+            mesh: meshes.add(Cuboid::new(40.0, 0.5, 150.0)),
             material: stone.clone(),
-            transform: Transform::from_xyz(0.0, *y, 45.0),
+            transform: Transform::from_xyz(0.0, *y, 75.0),
             ..default()
         });
     }
 
+    // point light
     commands.spawn(PointLightBundle {
         point_light: PointLight {
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        transform: Transform::from_xyz(0.0, 5.0, 0.0),
         ..default()
     });
 
@@ -118,7 +133,8 @@ fn setup(
         PbrBundle {
             mesh: meshes.add(Cuboid::new(2.0, 1.0, 1.0)),
             material: materials.add(StandardMaterial {
-                base_color: Color::hex("6688cc").unwrap(),
+                //base_color: Color::hex("6688cc").unwrap(),
+                base_color: Color::hex("050505").unwrap(),
                 unlit: true,
                 cull_mode: None,
                 ..default()
@@ -130,6 +146,7 @@ fn setup(
     ));
 
 
+    // text
     commands.spawn(
         TextBundle::from_section(
             "Testaroo",
@@ -147,6 +164,7 @@ fn setup(
         })
     );
 
+    // UI
     commands
         .spawn((
             NodeBundle {
@@ -169,8 +187,8 @@ fn setup(
             parent.spawn(ImageBundle {
                 style: Style {
                     position_type: PositionType::Absolute,
-                    left: Val::Percent(45.0),
-                    top: Val::Percent(50.0),
+                    left: Val::Percent(46.25),
+                    top: Val::Percent(48.0),
                     width: Val::Percent(7.5),
                     ..default()
                 },
@@ -209,4 +227,59 @@ fn cursor_ungrab(
         primary_window.cursor.grab_mode = CursorGrabMode::None;
         primary_window.cursor.visible = true;
     }
+}
+
+fn draw_gizmos(
+    mut gizmos: Gizmos,
+) {
+    /*
+    gizmos.cuboid(
+        Transform::from_translation(Vec3::Y * 0.5).with_scale(Vec3::splat(1.25)),
+        Color::BLACK,
+    );
+    gizmos.rect(
+        Vec3::new(time.elapsed_seconds().cos() * 2.5, 1., 0.),
+        Quat::from_rotation_y(PI / 2.),
+        Vec2::splat(2.),
+        Color::GREEN,
+    );
+
+    my_gizmos.sphere(Vec3::new(1., 0.5, 0.), Quat::IDENTITY, 0.5, Color::RED);
+
+    for y in [0., 0.5, 1.] {
+        gizmos.ray(
+            Vec3::new(1., y, 0.),
+            Vec3::new(-3., (time.elapsed_seconds() * 3.).sin(), 0.),
+            Color::BLUE,
+        );
+    }
+
+    my_gizmos
+        .arc_3d(
+            180.0_f32.to_radians(),
+            0.2,
+            Vec3::ONE,
+            Quat::from_rotation_arc(Vec3::Y, Vec3::ONE.normalize()),
+            Color::ORANGE,
+        )
+        .segments(10);
+
+    // Circles have 32 line-segments by default.
+    my_gizmos.circle(Vec3::ZERO, Direction3d::Y, 3., Color::BLACK);
+    // You may want to increase this for larger circles or spheres.
+    my_gizmos
+        .circle(Vec3::ZERO, Direction3d::Y, 3.1, Color::NAVY)
+        .segments(64);
+    my_gizmos
+        .sphere(Vec3::ZERO, Quat::IDENTITY, 3.2, Color::BLACK)
+        .circle_segments(64);
+     */
+    gizmos.arrow(Vec3::ZERO, Vec3::Y * 1.0, Color::BLUE);
+    gizmos.arrow(Vec3::ZERO, Vec3::X * 1.0, Color::RED);
+    gizmos.arrow(Vec3::ZERO, Vec3::Z * 1.0, Color::GREEN);
+    gizmos.cuboid(
+        Transform::from_translation(Vec3::ZERO).with_scale(Vec3::splat(1.0)),
+        Color::BLACK,
+    );
+
 }
