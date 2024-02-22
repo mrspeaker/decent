@@ -4,9 +4,11 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, apply_impulses);
-        app.add_systems(Update, apply_torque);
-        app.add_systems(Update, integrate);
+        app.add_systems(Update, (
+            apply_impulses,
+            apply_torque,
+            integrate
+        ));
     }
 }
 

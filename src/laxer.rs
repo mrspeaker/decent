@@ -33,8 +33,10 @@ impl Laxer {
 impl Plugin for LaxerPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, add_new_laxers)
-            .add_systems(Update, update_laxers);
+            .add_systems(Update, (
+                add_new_laxers,
+                update_laxers
+            ));
     }
 }
 

@@ -11,17 +11,19 @@ use laxer::LaxerPlugin;
 
 use rand::Rng;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
+use bevy::pbr::NotShadowCaster;
 use std::f32::consts::PI;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(CameraPlugin)
-        .add_plugins(PlayerPlugin)
-        .add_plugins(LaxerPlugin)
-        .add_plugins(PhysicsPlugin)
-        .add_systems(Startup, setup)
-        .add_systems(Startup, cursor_grab)
+        .add_plugins((
+            DefaultPlugins,
+            CameraPlugin,
+            PlayerPlugin,
+            LaxerPlugin,
+            PhysicsPlugin
+        ))
+        .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, cursor_ungrab)
         .run();
 }
@@ -32,6 +34,12 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+
+    commands.spawn(SceneBundle {
+        scene: assets.load("mountains.gltf#Scene0"),
+        transform: Transform::from_xyz(0.,0.,-150.).with_scale(Vec3::ONE * 1000.0),
+        ..default()
+    });
 
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
@@ -106,17 +114,20 @@ fn setup(
     });
 
         // sky
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Cuboid::new(2.0, 1.0, 1.0)),
-        material: materials.add(StandardMaterial {
-            base_color: Color::hex("6688cc").unwrap(),
-            unlit: true,
-            cull_mode: None,
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Cuboid::new(2.0, 1.0, 1.0)),
+            material: materials.add(StandardMaterial {
+                base_color: Color::hex("6688cc").unwrap(),
+                unlit: true,
+                cull_mode: None,
+                ..default()
+            }),
+            transform: Transform::from_scale(Vec3::splat(1_000.0)),
             ..default()
-        }),
-        transform: Transform::from_scale(Vec3::splat(1_000.0)),
-        ..default()
-    });
+        },
+        NotShadowCaster
+    ));
 
 
     commands.spawn(
