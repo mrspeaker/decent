@@ -43,15 +43,22 @@ fn setup(
         ..default()
     });
 
+     /*commands.insert_resource(AmbientLight {
+        color: Color::ORANGE_RED,
+        brightness: 890.0,
+     });*/
+
+
     // Sun
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: light_consts::lux::OVERCAST_DAY,
+            illuminance: light_consts::lux::AMBIENT_DAYLIGHT * 0.5,
+            color: Color::rgb(1.0, 0.9, 0.8),
             shadows_enabled: true,
             ..default()
         },
         transform: Transform {
-            translation: Vec3::new(0.0, 2.0, 0.0),
+            translation: Vec3::new(0.0, 2000.0, 0.0),
             rotation: Quat::from_rotation_x(-PI / 4.),
             ..default()
         },
@@ -115,8 +122,9 @@ fn setup(
         PbrBundle {
             mesh: meshes.add(Cuboid::new(2.0, 1.0, 1.0)),
             material: materials.add(StandardMaterial {
-                //base_color: Color::hex("6688cc").unwrap(),
-                base_color: Color::hex("050505").unwrap(),
+                base_color: Color::hex("88cc44").unwrap(),
+                //base_color: Color::hex("4488cc").unwrap(),
+                //base_color: Color::hex("050505").unwrap(),
                 unlit: true,
                 cull_mode: None,
                 ..default()
