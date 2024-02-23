@@ -4,34 +4,17 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (
-            apply_impulses,
-            apply_torque,
-            integrate
-        ));
+        app.add_systems(Update, integrate);
     }
 }
 
 
 #[derive(Component)]
-pub struct Velocity(pub Vec3);
-
-#[derive(Component)]
-pub struct Acceleration(pub Vec3);
-
-#[derive(Component, Debug)]
-pub struct Impulse(pub Vec3);
-
-#[derive(Component)]
-pub struct Torque(pub Vec3);
-
-#[derive(Component)]
-pub struct TorquePhysics {
+pub struct Impulse {
     vel: Vec3,
     acc: Vec3
 }
-
-impl TorquePhysics {
+impl Impulse {
     pub fn new() -> Self {
         Self {
             vel: Vec3::ZERO,
@@ -39,53 +22,53 @@ impl TorquePhysics {
         }
     }
 
-    pub fn spin(&mut self, v: f32) {
-        self.vel.y = v;
+    pub fn add_force(&mut self, v: Vec3) {
+        self.acc += v;
     }
 }
 
-fn apply_impulses(
-    mut cmds: Commands,
-    mut q: Query<(Entity, &Impulse, &mut Acceleration)>) {
+#[derive(Component)]
+pub struct Torque {
+    vel: Vec3,
+    acc: Vec3
+}
 
-    for (ent, imp, mut acc) in q.iter_mut() {
-        acc.0 = acc.0 + imp.0;
-        cmds.entity(ent).remove::<Impulse>();
+impl Torque {
+    pub fn new() -> Self {
+        Self {
+            vel: Vec3::ZERO,
+            acc: Vec3::ZERO
+        }
+    }
+
+    pub fn add_force(&mut self, v: Vec3) {
+        self.acc += v;
     }
 }
 
-fn apply_torque(
-    mut cmds: Commands,
-    mut q: Query<(Entity, &Torque, &mut TorquePhysics)>) {
-
-    for (ent, torque, mut tphys) in q.iter_mut() {
-        tphys.acc += torque.0;
-        cmds.entity(ent).remove::<Torque>();
-    }
-}
-
-fn integrate(time: Res<Time>, mut q:Query<(&mut Transform, &mut Velocity, &mut Acceleration, &mut TorquePhysics)>) {
-    for (mut t, mut vel, mut acc, mut tphys) in q.iter_mut() {
+fn integrate(time: Res<Time>, mut q:Query<(&mut Transform, &mut Impulse, &mut Torque)>) {
+    for (mut t, mut impulse, mut torque) in q.iter_mut() {
         // Translation
-        vel.0 += acc.0;
-        vel.0 *= 0.95; // Lol, friction
-        acc.0 = Vec3::ZERO;
+        let acc = impulse.acc;
+        impulse.vel += acc;
+        impulse.vel *= 0.95; // Lol, friction
+        impulse.acc = Vec3::ZERO;
 
         // Bob.
         let up = t.up();
-        t.translation += vel.0 + (up * 0.005 * (time.elapsed_seconds() * 3.0).sin());
+        t.translation += impulse.vel + (up * 0.005 * (time.elapsed_seconds() * 3.0).sin());
         if t.translation.y < 1.2 {
             t.translation.y = 1.2;
         }
 
         // Rotation
-        let arot = tphys.acc;
-        tphys.vel += arot;
-        tphys.vel *= 0.90; // Lol, friction
-        tphys.acc = Vec3::ZERO;
+        let arot = torque.acc;
+        torque.vel += arot;
+        torque.vel *= 0.90; // Lol, friction
+        torque.acc = Vec3::ZERO;
 
-        t.rotate_local_x(tphys.vel.x);
-        t.rotate_local_y(tphys.vel.y);
-        t.rotate_local_z(tphys.vel.z);
+        t.rotate_local_x(torque.vel.x);
+        t.rotate_local_y(torque.vel.y);
+        t.rotate_local_z(torque.vel.z);
     }
 }

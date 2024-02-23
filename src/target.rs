@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::laxer::LaxerFly;
+use crate::physics::{Impulse, Torque};
 use rand::Rng;
 
 pub struct TargetPlugin;
@@ -41,25 +42,38 @@ fn setup(
                 ),
                 ..default()
             },
-            Target(i)
+            Target(i),
+            Impulse::new(),
+            Torque::new()
         ));
     }
 }
 
 fn move_targets (
     time: Res<Time>,
-    mut q: Query<(&mut Transform, &Target)>)
+    mut q: Query<(&mut Transform, &Target, &mut Impulse)>)
 {
     let dt = time.delta_seconds();
     let elapsed = time.elapsed_seconds();
 
-    for (mut tr, t) in q.iter_mut() {
+    let mut rng = rand::thread_rng();
+
+
+    for (mut tr, t, mut imp) in q.iter_mut() {
         let right = tr.right();
         let i = t.0 as f32;
         tr.translation += right * dt *
 
                 (elapsed * (2.0 + i) * 0.01).sin() *
-                    ((i - 50.0) * 0.1);
+            ((i - 50.0) * 0.1);
+
+        if rng.gen::<f32>() * 100.0 < 0.5 {
+            imp.add_force(Vec3::new(
+                rng.gen::<f32>() - 0.5,
+                rng.gen::<f32>() - 0.5,
+                rng.gen::<f32>() - 0.5
+                    ).normalize() * 0.5);
+        }
     }
 }
 

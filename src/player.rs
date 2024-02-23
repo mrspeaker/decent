@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
-use crate::physics::{Velocity, Acceleration, Impulse, Torque, TorquePhysics};
+use crate::physics::{Impulse, Torque};
 use crate::laxer::Laxer;
 
 pub struct PlayerPlugin;
@@ -19,15 +19,11 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 fn init_player(mut cmds: Commands) {
-    let tp = TorquePhysics::new();
-    //tp.spin(3.1415);
-
     cmds.spawn((
         Transform::from_xyz(0.0, 8.0, 200.0),
         Player,
-        Velocity(Vec3::ZERO),
-        Acceleration(Vec3::ZERO),
-        tp
+        Impulse::new(),
+        Torque::new()
     ));
 }
 
@@ -37,13 +33,13 @@ fn update_player(
     keys: Res<ButtonInput<KeyCode>>,
     mut mouse_events: EventReader<MouseMotion>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
-    mut q: Query<(Entity, &mut Transform), With<Player>>)
+    mut q: Query<(Entity, &mut Transform, &mut Torque, &mut Impulse), With<Player>>)
 {
     let speed = 5.0;
     let sens = 0.01;
     let dt = time.delta_seconds();
 
-    if let Ok((ent, t)) = q.get_single_mut() {
+    if let Ok((ent, t, mut torque, mut impulse)) = q.get_single_mut() {
         let mut rot = Vec3::ZERO;
 
         // Manual roll
@@ -56,9 +52,7 @@ fn update_player(
         }
 
         if rot.length() > 0.0 {
-            cmds
-                .entity(ent)
-                .insert(Torque(rot * sens * dt));
+            torque.add_force(rot * sens * dt);
         }
 
         let mut imp = Vec3::ZERO;
@@ -70,9 +64,7 @@ fn update_player(
         if keys.pressed(KeyCode::KeyE) { imp += Vec3::from(t.up()); }
 
         if imp.length() > 0.0 {
-            cmds
-                .entity(ent)
-                .insert(Impulse (imp.normalize() * speed * dt));
+            impulse.add_force(imp.normalize() * speed * dt);
         }
 
         if mouse_buttons.just_pressed(MouseButton::Left) {
