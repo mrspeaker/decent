@@ -12,7 +12,6 @@ use laxer::LaxerPlugin;
 use target::TargetPlugin;
 
 use bevy::window::{CursorGrabMode, PrimaryWindow};
-use bevy::pbr::NotShadowCaster;
 use std::f32::consts::PI;
 
 fn main() {
@@ -36,6 +35,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+
     // Terrain
     commands.spawn(SceneBundle {
         scene: assets.load("mountains.gltf#Scene0"),
@@ -116,25 +116,6 @@ fn setup(
         transform: Transform::from_xyz(0.0, 5.0, 0.0),
         ..default()
     });
-
-        // sky
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(2.0, 1.0, 1.0)),
-            material: materials.add(StandardMaterial {
-                base_color: Color::hex("88cc44").unwrap(),
-                //base_color: Color::hex("4488cc").unwrap(),
-                //base_color: Color::hex("050505").unwrap(),
-                unlit: true,
-                cull_mode: None,
-                ..default()
-            }),
-            transform: Transform::from_scale(Vec3::splat(1_000.0)),
-            ..default()
-        },
-        NotShadowCaster
-    ));
-
 
     // text
     commands.spawn(

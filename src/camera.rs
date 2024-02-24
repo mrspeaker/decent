@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_atmosphere::prelude::*;
 use crate::player::Player;
 
 pub struct CameraPlugin;
@@ -9,6 +10,7 @@ pub struct Camera;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app
+            .add_plugins(AtmospherePlugin)
             .add_systems(Startup, init_camera)
             .add_systems(Update, sync_camera);
     }
@@ -24,6 +26,7 @@ fn init_camera(mut cmds: Commands) {
             ).looking_to(Vec3::Z, Vec3::Y),
             ..default()
         },
+        AtmosphereCamera::default(),
         Camera
     ));
 }
