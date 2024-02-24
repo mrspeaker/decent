@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
-use crate::physics::{Impulse, Torque};
+use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
 use bevy_mod_raycast::prelude::*;
 
@@ -25,7 +25,8 @@ fn init_player(mut cmds: Commands) {
         Transform::from_xyz(0.0, 8.0, 200.0),
         Player,
         Impulse::new(),
-        Torque::new()
+        Torque::new(),
+        Bob
     ));
 }
 
@@ -88,7 +89,7 @@ fn auto_level(
 
 fn raycast(
     mut raycast: Raycast,
-    mut gizmos: Gizmos,
+    //mut gizmos: Gizmos,
     mut q: Query<(&Transform, &mut Impulse), With<Player>>
 ) {
     if let Ok((t, mut i)) = q.get_single_mut() {
@@ -96,14 +97,17 @@ fn raycast(
             t.translation,
             t.rotation * -Vec3::Z
         );
-        let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
+        //let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
+        let hits = raycast.cast_ray(ray, &RaycastSettings::default());
         if let Some((_, hit)) = hits.first() {
             let dist = hit.distance();
-            if dist < 20.0 {
+            let min = 5.0;
+            if dist < min {
+                let b = ((min - dist) / min) * 0.3;
                 // Bounce back
                 i.add_force(
-                    t.back().normalize() * 0.1 +
-                        hit.normal().normalize() * 0.1
+                    t.back().normalize() * b +
+                        hit.normal().normalize() * b
                 );
             }
         }

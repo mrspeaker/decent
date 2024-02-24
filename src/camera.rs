@@ -26,6 +26,14 @@ fn init_camera(mut cmds: Commands) {
             ).looking_to(Vec3::Z, Vec3::Y),
             ..default()
         },
+        FogSettings {
+            color: Color::rgba(0.15, 0.15, 0.15, 1.0),
+            falloff: FogFalloff::Linear {
+                start: 300.0,
+                end: 800.0,
+            },
+            ..default()
+        },
         AtmosphereCamera::default(),
         Camera
     ));
