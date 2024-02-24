@@ -58,7 +58,7 @@ fn add_new_laxers(
             .with_children(|parent| {
                 for x in &[-1.0, 1.0] {
                     parent.spawn(PbrBundle {
-                        mesh: meshes.add(Mesh::from(Cuboid::new(0.1, 0.1, 4.0))),
+                        mesh: meshes.add(Mesh::from(Cuboid::new(0.2, 0.2, 8.0))),
                         material: materials.add(StandardMaterial {
                             base_color: Color::hex("ff00ff").unwrap(),
                             unlit: true,
@@ -78,7 +78,7 @@ fn update_laxers (
     mut q: Query<(Entity, &mut Transform, &mut LaxerFly)>) {
     for (e, mut t, mut l) in q.iter_mut() {
         let fwd = t.forward();
-        t.translation += fwd * 200.0 * time.delta_seconds();
+        t.translation += fwd * 400.0 * time.delta_seconds();
         l.time -= time.delta_seconds();
         if l.time <= 0.0 {
             cmds.entity(e).despawn_recursive();
