@@ -4,7 +4,10 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (bob, integrate));
+        app.add_systems(Update, (
+            bob,
+            integrate
+        ));
     }
 }
 
@@ -77,6 +80,6 @@ fn bob(
 ) {
     for (t, mut impulse) in q.iter_mut() {
         let up = t.up();
-        impulse.acc += up * 0.005 * (time.elapsed_seconds() * 3.0).sin();
+        impulse.acc += up * 0.001 * (time.elapsed_seconds() * 3.0).sin();
     }
 }

@@ -6,6 +6,11 @@ use bevy_mod_raycast::prelude::*;
 
 pub struct PlayerPlugin;
 
+const SPEED: f32 = 5.0;
+const SPEED_ROLL: f32 = 5.0 * 2.0;
+const SENS: f32 = 0.005;
+
+
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, init_player);
@@ -22,7 +27,8 @@ pub struct Player;
 
 fn init_player(mut cmds: Commands) {
     cmds.spawn((
-        Transform::from_xyz(0.0, 8.0, 200.0),
+        Transform::from_xyz(150.0, 70.0, 300.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         Player,
         Impulse::new(),
         Torque::new(),
@@ -36,18 +42,16 @@ fn update_player(
     keys: Res<ButtonInput<KeyCode>>,
     mut mouse_events: EventReader<MouseMotion>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
-    mut q: Query<(Entity, &mut Transform, &mut Torque, &mut Impulse), With<Player>>)
+    mut q: Query<(&mut Transform, &mut Torque, &mut Impulse), With<Player>>)
 {
-    let speed = 5.0;
-    let sens = 0.01;
     let dt = time.delta_seconds();
 
-    if let Ok((ent, t, mut torque, mut impulse)) = q.get_single_mut() {
+    if let Ok((t, mut torque, mut impulse)) = q.get_single_mut() {
         let mut rot = Vec3::ZERO;
 
         // Manual roll
-        if keys.pressed(KeyCode::KeyZ) { rot.z = speed * 4.0; }
-        if keys.pressed(KeyCode::KeyC) { rot.z = -speed * 4.0; }
+        if keys.pressed(KeyCode::KeyZ) { rot.z = SPEED_ROLL; }
+        if keys.pressed(KeyCode::KeyC) { rot.z = -SPEED_ROLL; }
 
         for event in mouse_events.read() {
             rot.x = -event.delta.y; // Pitch
@@ -55,7 +59,7 @@ fn update_player(
         }
 
         if rot.length() > 0.0 {
-            torque.add_force(rot * sens * dt);
+            torque.add_force(rot * SENS * dt);
         }
 
         let mut imp = Vec3::ZERO;
@@ -67,7 +71,7 @@ fn update_player(
         if keys.pressed(KeyCode::KeyE) { imp += Vec3::from(t.up()); }
 
         if imp.length() > 0.0 {
-            impulse.add_force(imp.normalize() * speed * dt);
+            impulse.add_force(imp.normalize() * SPEED * dt);
         }
 
         if mouse_buttons.just_pressed(MouseButton::Left) {

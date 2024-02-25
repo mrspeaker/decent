@@ -38,7 +38,7 @@ fn setup(
 
     // Terrain
     commands.spawn(SceneBundle {
-        scene: assets.load("mountains.gltf#Scene0"),
+        scene: assets.load("moutain2.glb#Scene0"),
         transform: Transform::from_xyz(0.,0.,-150.).with_scale(Vec3::ONE * 1000.0),
         ..default()
     });
