@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::laxer::LaxerFly;
 use crate::physics::{Impulse, Torque};
+use crate::particles::Explosion;
 use rand::Rng;
 
 pub struct TargetPlugin;
@@ -28,14 +29,15 @@ fn setup(
     let mut rng = rand::thread_rng();
     let car_one = assets.load("renault_logan_2004.glb#Scene0");
     let car_two = assets.load("car3.glb#Scene0");
-    //let car_awesome = assets.load("car.glb#Scene0");
+    //let car_two = assets.load("car.glb#Scene0");
 
     for i in 1..50 {
-        let t = Transform::from_xyz(
+        let mut t = Transform::from_xyz(
             rng.gen::<f32>() * 300.0 - 150.0,
             rng.gen::<f32>() * 100.0,
             rng.gen::<f32>() * 300.0 - 150.0
         );
+        t.rotate_y(i as f32 * 37.0);
 
         commands.spawn((
             SceneBundle {
@@ -95,6 +97,7 @@ fn check_collisions (
             if lt.translation.distance(tt.translation) < 4.0 {
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
+                cmds.spawn(Explosion(tt.translation));
                 continue;
             }
         }

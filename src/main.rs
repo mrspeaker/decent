@@ -2,12 +2,14 @@ mod camera;
 mod player;
 mod physics;
 mod laxer;
+mod particles;
 mod target;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
 use player::PlayerPlugin;
 use physics::PhysicsPlugin;
+use particles::ParticlePlugin;
 use laxer::LaxerPlugin;
 use target::TargetPlugin;
 
@@ -22,7 +24,8 @@ fn main() {
             PlayerPlugin,
             LaxerPlugin,
             TargetPlugin,
-            PhysicsPlugin
+            PhysicsPlugin,
+            ParticlePlugin
         ))
         .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, (cursor_ungrab, draw_gizmos))
@@ -176,6 +179,21 @@ fn setup(
                 image: assets.load("cockpit.png").into(),
                 ..default()
             });
+
+            // Preloading particles for some reason
+            parent.spawn(ImageBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    left: Val::Percent(0.),
+                    top: Val::Percent(0.),
+                    width: Val::Percent(1.0),
+                    height: Val::Percent(1.0),
+                    ..default()
+                },
+                image: assets.load("exp1.png").into(),
+                ..default()
+            });
+
         });
 
 
