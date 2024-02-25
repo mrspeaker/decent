@@ -19,6 +19,7 @@ impl Plugin for CameraPlugin {
 fn init_camera(mut cmds: Commands) {
     cmds.spawn((
         Camera3dBundle {
+            projection: PerspectiveProjection { far: 2000.0, ..default() }.into(),
             transform: Transform::from_xyz(
                 0.0,
                 0.0,
@@ -29,7 +30,7 @@ fn init_camera(mut cmds: Commands) {
         FogSettings {
             color: Color::rgba(0.15, 0.15, 0.15, 1.0),
             falloff: FogFalloff::Linear {
-                start: 300.0,
+                start: 450.0,
                 end: 800.0,
             },
             ..default()
