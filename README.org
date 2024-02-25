@@ -1,0 +1,34 @@
+* Decent
+
+A not very decent go at Descent.
+
+
+** notes to self
+https://forum.unity.com/threads/confused-about-rotations.528673/
+
+
+private void Update()
+    {
+        var rot = ship.rotation;
+        rot.z = -rot.z;
+        navball.localRotation = Quaternion.Slerp(navball.localRotation, rot, _slerpSpeed);
+    }
+
+
+--------
+
+
+Quaternion relRot = Program.VesselInfo.WorldToReference(Program.VesselInfo.VesselOrientation, VesselInformation.FrameOfReference.Navball);
+Vector3 forward = relRot * Vector3.up;
+double roll = forward.SignedAngle((Vector3.up - forward)*-1, relRot * Vector3.forward);
+
+//the signed angle method:
+
+        public static float SignedAngle(this Vector3 normal, Vector3 a, Vector3 
+        {
+            return Mathf.Atan2(
+                Vector3.Dot(normal, Vector3.Cross(a, ),
+                Vector3.Dot(a, ) * Mathf.Rad2Deg;
+        }
+
+I create a vector going from UP (0,1,0) to the up vector of the vessel (which is basically the forward vector, it's the point on the navball). The I simply calculate the angle between that and the actual forward vector of the vessel along the up axis of the vessel.

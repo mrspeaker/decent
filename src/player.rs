@@ -82,12 +82,16 @@ fn update_player(
 
 
 fn auto_level(
+    time: Res<Time>,
     mut gizmos: Gizmos,
-    mut q: Query<&mut Transform, With<Player>>
+    mut q: Query<(&mut Transform, &mut Torque), With<Player>>
 ) {
-    if let Ok(t) = q.get_single_mut() {
-        gizmos.arrow(Vec3::ZERO, t.rotation.to_axis_angle().0, Color::YELLOW);
-
+    if let Ok((mut t, torque)) = q.get_single_mut() {
+        let rot = t.rotation.to_euler(EulerRot::XYZ);
+        let rot2 = t.rotation.to_scaled_axis();
+        let a = t.rotation.angle_between(Quat::from_axis_angle(Vec3::Z, 0.));
+        gizmos.arrow(Vec3::ZERO, rot2, Color::YELLOW);
+        //t.rotation = t.rotation.slerp(Quat::from_axis_angle(Vec3::Z, 0.), time.delta_seconds() * 4.0);
     }
 }
 
