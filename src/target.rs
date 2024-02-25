@@ -8,6 +8,7 @@ pub struct TargetPlugin;
 #[derive(Component)]
 pub struct Target(u32);
 
+
 impl Plugin for TargetPlugin {
     fn build(&self, app: &mut App) {
         app
@@ -25,7 +26,9 @@ fn setup(
 ) {
     // Floaty cube things
     let mut rng = rand::thread_rng();
-    let car = assets.load("renault_logan_2004.glb#Scene0");
+    let car_one = assets.load("renault_logan_2004.glb#Scene0");
+    let car_two = assets.load("car3.glb#Scene0");
+    //let car_awesome = assets.load("car.glb#Scene0");
 
     for i in 1..50 {
         let t = Transform::from_xyz(
@@ -36,7 +39,7 @@ fn setup(
 
         commands.spawn((
             SceneBundle {
-                scene: car.clone(),
+                scene: if i < 25 { car_one.clone() } else { car_two.clone() },
                 transform: t,
                 ..default()
             },
