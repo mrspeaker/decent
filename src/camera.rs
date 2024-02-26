@@ -7,6 +7,9 @@ pub struct CameraPlugin;
 #[derive(Component)]
 pub struct Camera;
 
+#[derive(Component)]
+pub struct TitleText;
+
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app

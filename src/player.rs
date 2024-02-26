@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
 use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
+// use crate::target::Target;
 use bevy_mod_raycast::prelude::*;
 
 pub struct PlayerPlugin;
@@ -24,6 +25,9 @@ impl Plugin for PlayerPlugin {
 
 #[derive(Component)]
 pub struct Player;
+
+#[derive(Component)]
+pub struct RayHit;
 
 fn init_player(mut cmds: Commands) {
     cmds.spawn((
@@ -80,7 +84,6 @@ fn update_player(
     }
 }
 
-
 fn auto_level(
     time: Res<Time>,
     mut gizmos: Gizmos,
@@ -96,8 +99,10 @@ fn auto_level(
 }
 
 fn raycast(
+    //mut cmds: Commands,
     mut raycast: Raycast,
     //mut gizmos: Gizmos,
+    //targets: Query<(), With<Target>>,
     mut q: Query<(&Transform, &mut Impulse), With<Player>>
 ) {
     if let Ok((t, mut i)) = q.get_single_mut() {
@@ -106,11 +111,18 @@ fn raycast(
             t.rotation * -Vec3::Z
         );
         //let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
-        let hits = raycast.cast_ray(ray, &RaycastSettings::default());
-        if let Some((_, hit)) = hits.first() {
+        //let filter = |entity| targets.contains(entity);
+        let settings = RaycastSettings::default();
+            //.with_filter(filter);
+        let hits = raycast.cast_ray(ray, &settings);
+        if let Some((entity, hit)) = hits.first() {
             let dist = hit.distance();
             let min = 5.0;
             if dist < min {
+                //cmds.entity(*entity).insert(RayHit);
+                //cmds.entity(*entity).despawn();
+                //println!("addded {:?}", entity);
+
                 let b = ((min - dist) / min) * 0.3;
                 // Bounce back
                 i.add_force(

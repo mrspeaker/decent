@@ -13,6 +13,8 @@ use particles::ParticlePlugin;
 use laxer::LaxerPlugin;
 use target::TargetPlugin;
 
+use crate::camera::TitleText;
+
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use std::f32::consts::PI;
 
@@ -151,13 +153,15 @@ fn setup(
             },
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "...Decent",
-                TextStyle {
-                    font_size: 20.,
-                    ..default()
-                },
-            ));
+            parent.spawn((
+                TextBundle::from_section(
+                    "...Decent",
+                    TextStyle {
+                        font_size: 20.,
+                        ..default()
+                    },
+                ),
+                TitleText));
             parent.spawn(ImageBundle {
                 style: Style {
                     position_type: PositionType::Absolute,

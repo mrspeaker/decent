@@ -1,13 +1,39 @@
 use bevy::prelude::*;
+use crate::camera::TitleText;
 use crate::laxer::LaxerFly;
 use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
+use crate::player::RayHit;
 use rand::Rng;
+use self::Adornment::*;
 
 pub struct TargetPlugin;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Adornment {
+    FunnyHat,
+    Sunnies,
+    ExtraLimb,
+    Umbrella,
+    RedScarf,
+    FakeBeard,
+    NoShirt,
+    FlipFlops
+}
+
+impl Adornment {
+    pub fn iter() -> impl Iterator<Item = Adornment> {
+        [FunnyHat, Sunnies, ExtraLimb, Umbrella,
+         RedScarf, FakeBeard, NoShirt, FlipFlops].iter().copied()
+    }
+}
+
 #[derive(Component)]
-pub struct Target(u32);
+pub struct Target {
+    id: u32,
+    perp: bool,
+    outfit: [Adornment; 3]
+}
 
 
 impl Plugin for TargetPlugin {
@@ -17,6 +43,7 @@ impl Plugin for TargetPlugin {
             .add_systems(Update, (
                 move_targets,
                 check_collisions,
+                got_ray_hit
             ));
     }
 }
@@ -31,25 +58,48 @@ fn setup(
     let car_two = assets.load("car3.glb#Scene0");
     //let car_two = assets.load("car.glb#Scene0");
 
-    for i in 1..50 {
-        let mut t = Transform::from_xyz(
-            rng.gen::<f32>() * 300.0 - 150.0,
-            rng.gen::<f32>() * 100.0,
-            rng.gen::<f32>() * 300.0 - 150.0
-        );
-        t.rotate_y(i as f32 * 37.0);
+    let ads: Vec<_> = Adornment::iter().collect();
+    let len = ads.len();
+    let mut id: u32 = 0;
 
-        commands.spawn((
-            SceneBundle {
-                scene: if i < 25 { car_one.clone() } else { car_two.clone() },
-                transform: t,
-                ..default()
-            },
-            Target(i),
-            Impulse::new(),
-            Torque::new()
-        ));
+    for i in 0..len {
+        for j in i+1..len {
+            for k in j+1..len {
+                let mut t = Transform::from_xyz(
+                    rng.gen::<f32>() * 300.0 - 150.0,
+                    rng.gen::<f32>() * 100.0,
+                    rng.gen::<f32>() * 300.0 - 150.0
+                );
+                t.rotate_y(id as f32 * 37.0);
+
+                let outfit = [
+                    ads[i],
+                    ads[j],
+                    ads[k]
+                ];
+
+                //println!("{:?} {:?}", id, outfit);
+
+                commands.spawn((
+                    SceneBundle {
+                        scene: if i < 25 { car_one.clone() } else { car_two.clone() },
+                        transform: t,
+                        ..default()
+                    },
+                    Target {
+                        id,
+                        perp: false,
+                        outfit
+                    },
+                    Impulse::new(),
+                    Torque::new(),
+                    //RaycastMesh::<()>::default(),
+                ));
+                id += 1;
+            }
+        }
     }
+
 }
 
 fn move_targets (
@@ -64,7 +114,7 @@ fn move_targets (
 
     for (mut tr, t, mut imp, mut tor) in q.iter_mut() {
         let forward = tr.forward();
-        let i = t.0 as f32;
+        let i = t.id as f32;
         tr.translation += forward * dt *
                 (elapsed * (2.0 + i) * 0.01) *
             ((i - 50.0) * 0.1);
@@ -89,17 +139,33 @@ fn move_targets (
 
 fn check_collisions (
     mut cmds: Commands,
+    mut title: Query<&mut Text, With<TitleText>>,
     lax: Query<(Entity, &Transform), With<LaxerFly>>,
-    q: Query<(Entity, &Transform), With<Target>>)
+    targets: Query<(Entity, &Transform, &Target), With<Target>>)
 {
     for (le, lt) in lax.iter() {
-        for (te, tt) in q.iter() {
+        for (te, tt, target) in targets.iter() {
             if lt.translation.distance(tt.translation) < 4.0 {
+                if let Ok(mut txt) = title.get_single_mut() {
+                    let dbg = format!("...{:?}", target.outfit);
+                    txt.sections[0].value = dbg.into();
+                }
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
                 cmds.spawn(Explosion(tt.translation));
                 continue;
             }
+        }
+    }
+}
+
+fn got_ray_hit (
+    q: Query<(Entity, Option<&Target>), Added<RayHit>>
+) {
+    for (e, op) in q.iter() {
+        println!("yup {:?}", e);
+        if let Some(t) = op {
+            println!("hit {:?}", t.id);
         }
     }
 }
