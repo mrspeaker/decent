@@ -155,14 +155,17 @@ fn check_collisions (
 }
 
 fn got_ray_hit (
-    q: Query<&Target, Added<RayHit>>,
+    mut cmds: Commands,
+    q: Query<(Entity, &Target), Added<RayHit>>,
     mut title: Query<&mut Text, With<TitleText>>,
 ) {
-    for t in q.iter() {
+    for (e, t) in q.iter() {
         if let Ok(mut txt) = title.get_single_mut() {
             let dbg = format!("...{:?}", t.outfit);
             txt.sections[0].value = dbg.into();
         }
 
+        // TODO: inefficient: will add/remove constantly while scanning.
+        cmds.entity(e).remove::<RayHit>();
     }
 }

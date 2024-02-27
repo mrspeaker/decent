@@ -116,20 +116,21 @@ fn raycast(
             let dist = hit.distance();
             let min = 5.0;
             if dist < min {
-                // Get root of mesh and attach RayHit
-                let root = match parent.iter_ancestors(*entity).last() {
-                    Some(root) => root,
-                    None => *entity
-                };
-                cmds.entity(root).insert(RayHit);
-
-
                 let b = ((min - dist) / min) * 0.3;
                 // Bounce back
                 i.add_force(
                     t.back().normalize() * b +
                         hit.normal().normalize() * b
                 );
+            }
+
+            if dist < 50.0 {
+                // Get root of mesh and attach RayHit
+                let root = match parent.iter_ancestors(*entity).last() {
+                    Some(root) => root,
+                    None => *entity
+                };
+                cmds.entity(root).insert(RayHit);
             }
         }
     }
