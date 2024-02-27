@@ -160,10 +160,16 @@ fn check_collisions (
 }
 
 fn got_ray_hit (
-    q: Query<(Entity, Option<&Target>), Added<RayHit>>
+    q: Query<(&Parent, Entity, Option<&Target>), Added<RayHit>>,
+    parent: Query<&Parent>
+
 ) {
-    for (e, op) in q.iter() {
-        println!("yup {:?}", e);
+    for (p, e, op) in q.iter() {
+        println!("yup {:?} - {:?}", e, p);
+        for ancestor in parent.iter_ancestors(e) {
+            info!("{:?} is an ancestor of {:?}", ancestor, e);
+        }
+
         if let Some(t) = op {
             println!("hit {:?}", t.id);
         }

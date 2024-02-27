@@ -99,7 +99,7 @@ fn auto_level(
 }
 
 fn raycast(
-    //mut cmds: Commands,
+    mut cmds: Commands,
     mut raycast: Raycast,
     //mut gizmos: Gizmos,
     //targets: Query<(), With<Target>>,
@@ -113,13 +113,14 @@ fn raycast(
         //let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
         //let filter = |entity| targets.contains(entity);
         let settings = RaycastSettings::default();
-            //.with_filter(filter);
+        //.with_filter(filter);
         let hits = raycast.cast_ray(ray, &settings);
         if let Some((entity, hit)) = hits.first() {
+
             let dist = hit.distance();
             let min = 5.0;
             if dist < min {
-                //cmds.entity(*entity).insert(RayHit);
+                cmds.entity(*entity).insert(RayHit);
                 //cmds.entity(*entity).despawn();
                 //println!("addded {:?}", entity);
 
