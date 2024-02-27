@@ -139,17 +139,12 @@ fn move_targets (
 
 fn check_collisions (
     mut cmds: Commands,
-    mut title: Query<&mut Text, With<TitleText>>,
     lax: Query<(Entity, &Transform), With<LaxerFly>>,
-    targets: Query<(Entity, &Transform, &Target), With<Target>>)
+    targets: Query<(Entity, &Transform), With<Target>>)
 {
     for (le, lt) in lax.iter() {
-        for (te, tt, target) in targets.iter() {
+        for (te, tt) in targets.iter() {
             if lt.translation.distance(tt.translation) < 4.0 {
-                if let Ok(mut txt) = title.get_single_mut() {
-                    let dbg = format!("...{:?}", target.outfit);
-                    txt.sections[0].value = dbg.into();
-                }
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
                 cmds.spawn(Explosion(tt.translation));
@@ -160,18 +155,14 @@ fn check_collisions (
 }
 
 fn got_ray_hit (
-    q: Query<(&Parent, Entity, Option<&Target>), Added<RayHit>>,
-    parent: Query<&Parent>
-
+    q: Query<&Target, Added<RayHit>>,
+    mut title: Query<&mut Text, With<TitleText>>,
 ) {
-    for (p, e, op) in q.iter() {
-        println!("yup {:?} - {:?}", e, p);
-        for ancestor in parent.iter_ancestors(e) {
-            info!("{:?} is an ancestor of {:?}", ancestor, e);
+    for t in q.iter() {
+        if let Ok(mut txt) = title.get_single_mut() {
+            let dbg = format!("...{:?}", t.outfit);
+            txt.sections[0].value = dbg.into();
         }
 
-        if let Some(t) = op {
-            println!("hit {:?}", t.id);
-        }
     }
 }

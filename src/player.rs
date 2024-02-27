@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
 use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
-// use crate::target::Target;
 use bevy_mod_raycast::prelude::*;
 
 pub struct PlayerPlugin;
@@ -101,9 +100,8 @@ fn auto_level(
 fn raycast(
     mut cmds: Commands,
     mut raycast: Raycast,
-    //mut gizmos: Gizmos,
-    //targets: Query<(), With<Target>>,
-    mut q: Query<(&Transform, &mut Impulse), With<Player>>
+    mut q: Query<(&Transform, &mut Impulse), With<Player>>,
+    parent: Query<&Parent>
 ) {
     if let Ok((t, mut i)) = q.get_single_mut() {
         let ray = Ray3d::new(
@@ -113,16 +111,18 @@ fn raycast(
         //let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
         //let filter = |entity| targets.contains(entity);
         let settings = RaycastSettings::default();
-        //.with_filter(filter);
         let hits = raycast.cast_ray(ray, &settings);
         if let Some((entity, hit)) = hits.first() {
-
             let dist = hit.distance();
             let min = 5.0;
             if dist < min {
-                cmds.entity(*entity).insert(RayHit);
-                //cmds.entity(*entity).despawn();
-                //println!("addded {:?}", entity);
+                // Get root of mesh and attach RayHit
+                let root = match parent.iter_ancestors(*entity).last() {
+                    Some(root) => root,
+                    None => *entity
+                };
+                cmds.entity(root).insert(RayHit);
+
 
                 let b = ((min - dist) / min) * 0.3;
                 // Bounce back

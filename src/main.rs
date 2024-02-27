@@ -53,7 +53,6 @@ fn setup(
         brightness: 890.0,
      });*/
 
-
     // Sun
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
