@@ -47,6 +47,11 @@ fn setup(
         transform: Transform::from_xyz(0.,0.,-150.).with_scale(Vec3::ONE * 1000.0),
         ..default()
     });
+    commands.spawn(SceneBundle {
+        scene: assets.load("truck_town.glb#Scene0"),
+        transform: Transform::from_xyz(0.,-0.01,0.).with_scale(Vec3::ONE * 5.0),
+        ..default()
+    });
 
      /*commands.insert_resource(AmbientLight {
         color: Color::ORANGE_RED,
