@@ -79,12 +79,12 @@ fn setup(
                         let c = match o {
                             Adornment::FunnyHat => Color::rgb(0.0, 0.0, 1.0),
                             Adornment::Sunnies => Color::rgb(0.0, 1.0, 0.0),
-                            Adornment::RedScarf => Color::rgb(1.0, 0.0, 0.0),
+                            Adornment::ExtraLimb => Color::rgb(1.0, 0.0, 0.0),
                             Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
-                            Adornment::ExtraLimb => Color::rgb(1.0, 1.0, 0.0),
+                            Adornment::RedScarf => Color::rgb(1.0, 1.0, 0.0),
                             Adornment::FakeBeard => Color::rgb(1.0, 0.0, 1.0),
                             Adornment::NoShirt => Color::rgb(0.0, 1.0, 1.0),
-                            _ => Color::rgb(1.0, 1.0, 1.0)
+                            Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
                         };
 
                         parent.spawn(
