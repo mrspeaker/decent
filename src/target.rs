@@ -5,28 +5,8 @@ use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
 use crate::player::RayHit;
 use rand::Rng;
-use self::Adornment::*;
-use crate::game::{GameEvent, Game};
+use crate::game::{GameEvent, Game, Adornment};
 pub struct TargetPlugin;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Adornment {
-    FunnyHat,
-    Sunnies,
-    ExtraLimb,
-    Umbrella,
-    RedScarf,
-    FakeBeard,
-    NoShirt,
-    FlipFlops
-}
-
-impl Adornment {
-    pub fn iter() -> impl Iterator<Item = Adornment> {
-        [FunnyHat, Sunnies, ExtraLimb, Umbrella,
-         RedScarf, FakeBeard, NoShirt, FlipFlops].iter().copied()
-    }
-}
 
 #[derive(Component)]
 pub struct Target {
@@ -34,7 +14,6 @@ pub struct Target {
     perp: bool,
     outfit: [Adornment; 3]
 }
-
 
 impl Plugin for TargetPlugin {
     fn build(&self, app: &mut App) {
@@ -60,8 +39,8 @@ fn setup(
 
     let ads: Vec<_> = Adornment::iter().collect();
     let len = ads.len();
-    let mut id: u32 = 0;
 
+    let mut id: u32 = 0;
     for i in 0..len {
         for j in i+1..len {
             for k in j+1..len {
@@ -88,12 +67,11 @@ fn setup(
                     },
                     Target {
                         id,
-                        perp: false,
+                        perp: id == 0,
                         outfit
                     },
                     Impulse::new(),
                     Torque::new(),
-                    //RaycastMesh::<()>::default(),
                 ));
                 id += 1;
             }
@@ -140,15 +118,20 @@ fn move_targets (
 fn check_collisions (
     mut cmds: Commands,
     lax: Query<(Entity, &Transform), With<LaxerFly>>,
-    targets: Query<(Entity, &Transform), With<Target>>)
+    targets: Query<(Entity, &Transform, &Target), With<Target>>)
 {
     for (le, lt) in lax.iter() {
-        for (te, tt) in targets.iter() {
+        for (te, tt, trg) in targets.iter() {
             if lt.translation.distance(tt.translation) < 4.0 {
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
                 cmds.spawn(Explosion(tt.translation));
                 cmds.spawn(GameEvent(1));
+                if trg.perp {
+                    cmds.spawn(Explosion(tt.translation + Vec3::Y * 5.0));
+                    cmds.spawn(Explosion(tt.translation + Vec3::X * 5.0));
+                    cmds.spawn(Explosion(tt.translation + Vec3::Z * 5.0));
+                }
                 continue;
             }
         }

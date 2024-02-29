@@ -24,12 +24,12 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             CameraPlugin,
+            GamePlugin,
             PlayerPlugin,
             LaxerPlugin,
             TargetPlugin,
             PhysicsPlugin,
             ParticlePlugin,
-            GamePlugin
         ))
         .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, (cursor_ungrab, draw_gizmos))
@@ -42,7 +42,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
     // Terrain
     commands.spawn(SceneBundle {
         scene: assets.load("moutain2.glb#Scene0"),
@@ -58,12 +57,6 @@ fn setup(
     commands.spawn(SceneBundle {
         scene: assets.load("Michelle.glb#Scene0"),
         transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
-        ..default()
-    });
-
-    commands.spawn(SceneBundle {
-        scene: assets.load("eva.glb#Scene0"),
-        transform: Transform::from_xyz(3.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
 

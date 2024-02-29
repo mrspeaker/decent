@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use self::Adornment::*;
 
 pub struct GamePlugin;
 
@@ -9,6 +10,26 @@ pub struct GameEvent(pub u32);
 pub struct Game {
     pub score: i32,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Adornment {
+    FunnyHat,
+    Sunnies,
+    ExtraLimb,
+    Umbrella,
+    RedScarf,
+    FakeBeard,
+    NoShirt,
+    FlipFlops
+}
+
+impl Adornment {
+    pub fn iter() -> impl Iterator<Item = Adornment> {
+        [FunnyHat, Sunnies, ExtraLimb, Umbrella,
+         RedScarf, FakeBeard, NoShirt, FlipFlops].iter().copied()
+    }
+}
+
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
@@ -26,7 +47,7 @@ impl Plugin for GamePlugin {
 fn setup_game(
     mut game: ResMut<Game>
 ) {
-    game.score = 0;
+    game.score = 1;
 }
 
 fn game_event_system(
@@ -34,6 +55,8 @@ fn game_event_system(
     q: Query<&GameEvent, Added<GameEvent>>
 ) {
     for e in q.iter() {
-        game.score +=1 ;
+        if e.0 == 1 {
+            game.score +=1 ;
+        }
     }
 }
