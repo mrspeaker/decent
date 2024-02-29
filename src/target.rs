@@ -6,7 +6,7 @@ use crate::particles::Explosion;
 use crate::player::RayHit;
 use rand::Rng;
 use self::Adornment::*;
-
+use crate::game::{GameEvent, Game};
 pub struct TargetPlugin;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -148,6 +148,7 @@ fn check_collisions (
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
                 cmds.spawn(Explosion(tt.translation));
+                cmds.spawn(GameEvent(1));
                 continue;
             }
         }
@@ -158,10 +159,11 @@ fn got_ray_hit (
     mut cmds: Commands,
     q: Query<(Entity, &Target), Added<RayHit>>,
     mut title: Query<&mut Text, With<TitleText>>,
+    game: Res<Game>
 ) {
     for (e, t) in q.iter() {
         if let Ok(mut txt) = title.get_single_mut() {
-            let dbg = format!("...{:?}", t.outfit);
+            let dbg = format!("...{:?} {:?}", game.score, t.outfit);
             txt.sections[0].value = dbg.into();
         }
 

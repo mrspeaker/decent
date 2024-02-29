@@ -4,6 +4,7 @@ mod physics;
 mod laxer;
 mod particles;
 mod target;
+mod game;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
@@ -12,7 +13,7 @@ use physics::PhysicsPlugin;
 use particles::ParticlePlugin;
 use laxer::LaxerPlugin;
 use target::TargetPlugin;
-
+use game::GamePlugin;
 use crate::camera::TitleText;
 
 use bevy::window::{CursorGrabMode, PrimaryWindow};
@@ -27,7 +28,8 @@ fn main() {
             LaxerPlugin,
             TargetPlugin,
             PhysicsPlugin,
-            ParticlePlugin
+            ParticlePlugin,
+            GamePlugin
         ))
         .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, (cursor_ungrab, draw_gizmos))
@@ -49,7 +51,19 @@ fn setup(
     });
     commands.spawn(SceneBundle {
         scene: assets.load("truck_town.glb#Scene0"),
-        transform: Transform::from_xyz(0.,-0.01,0.).with_scale(Vec3::ONE * 5.0),
+        transform: Transform::from_xyz(-20.,-0.01,0.).with_scale(Vec3::ONE * 5.0),
+        ..default()
+    });
+
+    commands.spawn(SceneBundle {
+        scene: assets.load("Michelle.glb#Scene0"),
+        transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
+        ..default()
+    });
+
+    commands.spawn(SceneBundle {
+        scene: assets.load("eva.glb#Scene0"),
+        transform: Transform::from_xyz(3.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
 
