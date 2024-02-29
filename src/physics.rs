@@ -30,6 +30,10 @@ impl Impulse {
     pub fn add_force(&mut self, v: Vec3) {
         self.acc += v;
     }
+
+    pub fn speed(&self) -> f32 {
+        return self.vel.length();
+    }
 }
 
 #[derive(Component)]

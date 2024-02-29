@@ -5,7 +5,7 @@ use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
 use crate::player::RayHit;
 use rand::Rng;
-use crate::game::{GameEvent, Game, Adornment};
+use crate::game::{GameHitEvent, Game, Adornment};
 pub struct TargetPlugin;
 
 #[derive(Component)]
@@ -82,7 +82,11 @@ fn setup(
 
 fn move_targets (
     time: Res<Time>,
-    mut q: Query<(&mut Transform, &Target, &mut Impulse, &mut Torque)>)
+    mut q: Query<(
+        &mut Transform,
+        &Target,
+        &mut Impulse,
+        &mut Torque)>)
 {
     let dt = time.delta_seconds();
     let elapsed = time.elapsed_seconds();
@@ -91,18 +95,20 @@ fn move_targets (
 
 
     for (mut tr, t, mut imp, mut tor) in q.iter_mut() {
-        let forward = tr.forward();
+        let up = tr.up();
         let i = t.id as f32;
-        tr.translation += forward * dt *
-                (elapsed * (2.0 + i) * 0.01) *
+        tr.translation += up * dt *
+                (elapsed * (2.0 + i) * 1.).sin() *
             ((i - 50.0) * 0.1);
 
-        if rng.gen::<f32>() * 100.0 < 0.5 {
-            imp.add_force(Vec3::new(
-                rng.gen::<f32>() - 0.5,
-                rng.gen::<f32>() - 0.5,
-                rng.gen::<f32>() - 0.5
-                    ).normalize() * 0.1);
+        if imp.speed() < 0.01 {
+            if rng.gen::<f32>() * 100.0 < 0.5 {
+                imp.add_force(Vec3::new(
+                    rng.gen::<f32>() - 0.5,
+                    rng.gen::<f32>() - 0.5,
+                    rng.gen::<f32>() - 0.5
+                ).normalize() * 0.4);
+            }
         }
 
         if rng.gen::<f32>() * 100.0 < 0.5 {
@@ -118,7 +124,8 @@ fn move_targets (
 fn check_collisions (
     mut cmds: Commands,
     lax: Query<(Entity, &Transform), With<LaxerFly>>,
-    targets: Query<(Entity, &Transform, &Target), With<Target>>)
+    targets: Query<(Entity, &Transform, &Target), With<Target>>,
+    mut ev_hit: EventWriter<GameHitEvent> )
 {
     for (le, lt) in lax.iter() {
         for (te, tt, trg) in targets.iter() {
@@ -126,7 +133,7 @@ fn check_collisions (
                 cmds.entity(te).despawn_recursive();
                 cmds.entity(le).despawn_recursive();
                 cmds.spawn(Explosion(tt.translation));
-                cmds.spawn(GameEvent(1));
+                ev_hit.send(GameHitEvent(2));
                 if trg.perp {
                     cmds.spawn(Explosion(tt.translation + Vec3::Y * 5.0));
                     cmds.spawn(Explosion(tt.translation + Vec3::X * 5.0));

@@ -3,9 +3,6 @@ use self::Adornment::*;
 
 pub struct GamePlugin;
 
-#[derive(Component)]
-pub struct GameEvent(pub u32);
-
 #[derive(Resource, Default)]
 pub struct Game {
     pub score: i32,
@@ -30,6 +27,8 @@ impl Adornment {
     }
 }
 
+#[derive(Event)]
+pub struct GameHitEvent(pub u32);
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
@@ -40,7 +39,8 @@ impl Plugin for GamePlugin {
             ))
             .add_systems(Update, (
                 game_event_system,
-            ));
+            ))
+            .add_event::<GameHitEvent>();
     }
 }
 
@@ -52,11 +52,9 @@ fn setup_game(
 
 fn game_event_system(
     mut game: ResMut<Game>,
-    q: Query<&GameEvent, Added<GameEvent>>
+    mut ev_hit: EventReader<GameHitEvent>,
 ) {
-    for e in q.iter() {
-        if e.0 == 1 {
-            game.score +=1 ;
-        }
+    for hit in ev_hit.read() {
+        game.score += hit.0 as i32;
     }
 }
