@@ -30,6 +30,8 @@ impl Plugin for TargetPlugin {
 fn setup(
     mut commands: Commands,
     assets: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Floaty cube things
     let mut rng = rand::thread_rng();
@@ -72,7 +74,28 @@ fn setup(
                     },
                     Impulse::new(),
                     Torque::new(),
-                ));
+                )).with_children(|parent| {
+                    for (i, o) in outfit.iter().enumerate() {
+                        let c = match o {
+                            Adornment::FunnyHat => Color::rgb(0.0, 0.0, 1.0),
+                            Adornment::Sunnies => Color::rgb(0.0, 1.0, 0.0),
+                            Adornment::RedScarf => Color::rgb(1.0, 0.0, 0.0),
+                            Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
+                            Adornment::ExtraLimb => Color::rgb(1.0, 1.0, 0.0),
+                            Adornment::FakeBeard => Color::rgb(1.0, 0.0, 1.0),
+                            Adornment::NoShirt => Color::rgb(0.0, 1.0, 1.0),
+                            _ => Color::rgb(1.0, 1.0, 1.0)
+                        };
+
+                        parent.spawn(
+                            PbrBundle {
+                                mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
+                                material: materials.add(c),
+                                transform: Transform::from_xyz(i as f32 - 1.0, 3.0, 0.0),
+                                ..default()
+                            });
+                    }
+                });
                 id += 1;
             }
         }
