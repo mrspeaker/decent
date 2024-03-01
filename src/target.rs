@@ -5,7 +5,7 @@ use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
 use crate::player::RayHit;
 use rand::Rng;
-use crate::game::{GameHitEvent, Game, Adornment};
+use crate::game::{GameHitEvent, Game, Adornment, Outfits};
 pub struct TargetPlugin;
 
 #[derive(Component)]
@@ -32,6 +32,8 @@ fn setup(
     assets: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    game: Res<Game>,
+    outfits: Res<Outfits>
 ) {
     // Floaty cube things
     let mut rng = rand::thread_rng();
@@ -39,68 +41,56 @@ fn setup(
     let car_two = assets.load("car3.glb#Scene0");
     //let car_two = assets.load("car.glb#Scene0");
 
-    let ads: Vec<_> = Adornment::iter().collect();
-    let len = ads.len();
+    info!("ohhhhhhhhhhh {:?}", outfits.outfits);
 
-    let mut id: u32 = 0;
-    for i in 0..len {
-        for j in i+1..len {
-            for k in j+1..len {
-                let mut t = Transform::from_xyz(
-                    rng.gen::<f32>() * 300.0 - 150.0,
-                    rng.gen::<f32>() * 100.0,
-                    rng.gen::<f32>() * 300.0 - 150.0
-                );
-                t.rotate_y(id as f32 * 37.0);
+    if let Some(o) = outfits.outfits {
+        for i in 0..o.len() {
+            let mut t = Transform::from_xyz(
+                rng.gen::<f32>() * 300.0 - 150.0,
+                rng.gen::<f32>() * 100.0,
+                rng.gen::<f32>() * 300.0 - 150.0
+            );
+            t.rotate_y(i as f32 * 37.0);
 
-                let outfit = [
-                    ads[i],
-                    ads[j],
-                    ads[k]
-                ];
+            let outfit = o[i];
 
-                //println!("{:?} {:?}", id, outfit);
+            commands.spawn((
+                SceneBundle {
+                    scene: if i < 25 { car_one.clone() } else { car_two.clone() },
+                    transform: t,
+                    ..default()
+                },
+                Target {
+                    id: i as u32,
+                    perp: i as u32 == game.perp.unwrap(),
+                    outfit
+                },
+                Impulse::new(),
+                Torque::new(),
+            )).with_children(|parent| {
+                for (j, ad) in outfit.iter().enumerate() {
+                    let c = match ad {
+                        Adornment::FunnyHat => Color::rgb(0.0, 0.0, 1.0),
+                        Adornment::Sunnies => Color::rgb(0.0, 1.0, 0.0),
+                        Adornment::ExtraLimb => Color::rgb(1.0, 0.0, 0.0),
+                        Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
+                        Adornment::RedScarf => Color::rgb(1.0, 1.0, 0.0),
+                        Adornment::FakeBeard => Color::rgb(0.0, 1.0, 1.0),
+                        Adornment::NoShirt => Color::rgb(1.0, 1.0, 1.0),
+                        Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
+                    };
 
-                commands.spawn((
-                    SceneBundle {
-                        scene: if i < 25 { car_one.clone() } else { car_two.clone() },
-                        transform: t,
-                        ..default()
-                    },
-                    Target {
-                        id,
-                        perp: id == 0,
-                        outfit
-                    },
-                    Impulse::new(),
-                    Torque::new(),
-                )).with_children(|parent| {
-                    for (i, o) in outfit.iter().enumerate() {
-                        let c = match o {
-                            Adornment::FunnyHat => Color::rgb(0.0, 0.0, 1.0),
-                            Adornment::Sunnies => Color::rgb(0.0, 1.0, 0.0),
-                            Adornment::ExtraLimb => Color::rgb(1.0, 0.0, 0.0),
-                            Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
-                            Adornment::RedScarf => Color::rgb(1.0, 1.0, 0.0),
-                            Adornment::FakeBeard => Color::rgb(1.0, 0.0, 1.0),
-                            Adornment::NoShirt => Color::rgb(0.0, 1.0, 1.0),
-                            Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
-                        };
-
-                        parent.spawn(
-                            PbrBundle {
-                                mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
-                                material: materials.add(c),
-                                transform: Transform::from_xyz(i as f32 - 1.0, 3.0, 0.0),
-                                ..default()
-                            });
-                    }
-                });
-                id += 1;
-            }
+                    parent.spawn(
+                        PbrBundle {
+                            mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
+                            material: materials.add(c),
+                            transform: Transform::from_xyz(j as f32 - 1.0, 3.0, 0.0),
+                            ..default()
+                        });
+                }
+            });
         }
     }
-
 }
 
 fn move_targets (
@@ -176,7 +166,11 @@ fn got_ray_hit (
 ) {
     for (e, t) in q.iter() {
         if let Ok(mut txt) = title.get_single_mut() {
-            let dbg = format!("...{:?} {:?}", game.score, t.outfit);
+            let perp_outfit = game.perp_outfit.unwrap();
+            let dbg = format!("...{:?} {:?}", game.score, t.outfit.map(|o| {
+                let has = perp_outfit.iter().any(|&x| x == o);
+                return (has, o);
+            }));
             txt.sections[0].value = dbg.into();
         }
 
