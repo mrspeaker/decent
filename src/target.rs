@@ -41,8 +41,6 @@ fn setup(
     let car_two = assets.load("car3.glb#Scene0");
     //let car_two = assets.load("car.glb#Scene0");
 
-    info!("ohhhhhhhhhhh {:?}", outfits.outfits);
-
     if let Some(o) = outfits.outfits {
         for i in 0..o.len() {
             let mut t = Transform::from_xyz(
@@ -79,14 +77,28 @@ fn setup(
                         Adornment::NoShirt => Color::rgb(1.0, 1.0, 1.0),
                         Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
                     };
-
-                    parent.spawn(
-                        PbrBundle {
-                            mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
-                            material: materials.add(c),
-                            transform: Transform::from_xyz(j as f32 - 1.0, 3.0, 0.0),
+                    if *ad == Adornment::Sunnies {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("glasses.glb#Scene0"),
+                            transform: Transform::from_xyz(0., 2.0,3.).with_scale(Vec3::ONE * 3.0),
                             ..default()
                         });
+
+                    } else if *ad == Adornment::ExtraLimb {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("arm.glb#Scene0"),
+                            transform: Transform::from_xyz(1.5, 1.5,0.).with_scale(Vec3::ONE * 1.5),
+                            ..default()
+                        });
+                    } else {
+                        parent.spawn(
+                            PbrBundle {
+                                mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
+                                material: materials.add(c),
+                                transform: Transform::from_xyz(j as f32 - 1.0, 3.0, 0.0),
+                                ..default()
+                            });
+                    }
                 }
             });
         }
