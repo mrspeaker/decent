@@ -48,7 +48,7 @@ impl Plugin for GamePlugin {
         app
             .init_resource::<Game>()
             .init_resource::<Outfits>()
-            .add_systems(Startup, (
+            .add_systems(PreStartup, (
                 setup_game,
             ))
             .add_systems(Update, (

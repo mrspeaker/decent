@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_atmosphere::prelude::*;
 use crate::player::Player;
+use bevy::core_pipeline::tonemapping::Tonemapping;
+use bevy::render::view::ColorGrading;
 
 pub struct CameraPlugin;
 
@@ -23,6 +25,7 @@ fn init_camera(mut cmds: Commands) {
     cmds.spawn((
         Camera3dBundle {
             projection: PerspectiveProjection { far: 2000.0, ..default() }.into(),
+            tonemapping: Tonemapping::ReinhardLuminance, //Tonemapping::TonyMcMapface,
             transform: Transform::from_xyz(
                 0.0,
                 0.0,
@@ -47,10 +50,9 @@ fn sync_camera(
     player: Query<&Transform, With<Player>>,
     mut q: Query<&mut Transform, (With<Camera>, Without<Player>)>
 ) {
-    if let Ok(p) = player.get_single() {
-        if let Ok(mut t) = q.get_single_mut() {
-            t.translation = p.translation;
-            t.rotation = p.rotation;
-        }
-    }
+    let Ok(p) = player.get_single() else { return; };
+    let Ok(mut t) = q.get_single_mut() else { return; };
+
+    t.translation = p.translation;
+    t.rotation = p.rotation;
 }

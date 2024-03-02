@@ -55,28 +55,21 @@ fn setup(
     });
 
     commands.spawn(SceneBundle {
-        scene: assets.load("glasses.glb#Scene0"),
-        transform: Transform::from_xyz(0., 30.0,0.).with_scale(Vec3::ONE * 50.0),
-        ..default()
-    });
-
-
-    commands.spawn(SceneBundle {
         scene: assets.load("Michelle.glb#Scene0"),
         transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
 
-     /*commands.insert_resource(AmbientLight {
-        color: Color::ORANGE_RED,
-        brightness: 890.0,
+   /*  commands.insert_resource(AmbientLight {
+        color: Color::WHITE,
+        brightness: 1000.0,
      });*/
 
     // Sun
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: light_consts::lux::AMBIENT_DAYLIGHT * 0.5,
-            color: Color::rgb(1.0, 0.9, 0.8),
+            illuminance: light_consts::lux::AMBIENT_DAYLIGHT,
+            color: Color::rgb(1.0, 1.0, 1.0),
             shadows_enabled: true,
             ..default()
         },

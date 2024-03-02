@@ -90,6 +90,18 @@ fn setup(
                             transform: Transform::from_xyz(1.5, 1.5,0.).with_scale(Vec3::ONE * 1.5),
                             ..default()
                         });
+                    } else if *ad == Adornment::FunnyHat {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("hat.glb#Scene0"),
+                            transform: Transform::from_xyz(0., 2.8,0.).with_scale(Vec3::ONE * 1.5),
+                            ..default()
+                        });
+                    } else if *ad == Adornment::FakeBeard {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("beard.glb#Scene0"),
+                            transform: Transform::from_xyz(0., 0.5,3.7).with_scale(Vec3::ONE * 4.2),
+                            ..default()
+                        });
                     } else {
                         parent.spawn(
                             PbrBundle {
