@@ -3,13 +3,13 @@ use bevy::input::mouse::MouseMotion;
 use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
 use bevy_mod_raycast::prelude::*;
+use crate::camera::TitleText;
 
 pub struct PlayerPlugin;
 
-const SPEED: f32 = 5.0;
-const SPEED_ROLL: f32 = 5.0 * 2.0;
+const SPEED: f32 = 2.0;
+const SPEED_ROLL: f32 = 5.0;
 const SENS: f32 = 0.005;
-
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
@@ -103,7 +103,8 @@ fn raycast(
     mut cmds: Commands,
     mut raycast: Raycast,
     mut q: Query<(&Transform, &mut Impulse), With<Player>>,
-    parent: Query<&Parent>
+    parent: Query<&Parent>,
+    mut title: Query<&mut Text, With<TitleText>>,
 ) {
     let Ok((t, mut i)) = q.get_single_mut() else { return; };
     let ray = Ray3d::new(
@@ -111,7 +112,6 @@ fn raycast(
         t.rotation * -Vec3::Z
     );
     //let hits = raycast.debug_cast_ray(ray, &RaycastSettings::default(), &mut gizmos);
-    //let filter = |entity| targets.contains(entity);
     let settings = RaycastSettings::default();
     let hits = raycast.cast_ray(ray, &settings);
     let Some((entity, hit)) = hits.first() else { return; };
@@ -134,6 +134,12 @@ fn raycast(
             None => *entity
         };
         cmds.entity(root).insert(RayHit);
+    } else {
+        // no hit
+        if let Ok(mut txt) = title.get_single_mut() {
+            txt.sections[0].value = "".into();
+        }
+
     }
 
 }

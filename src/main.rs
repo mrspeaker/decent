@@ -63,27 +63,26 @@ fn setup(
         ..default()
     });
 
-   /*  commands.insert_resource(AmbientLight {
+     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
         brightness: 1000.0,
-     });*/
+     });
 
     // Sun
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             illuminance: light_consts::lux::AMBIENT_DAYLIGHT,
-            color: Color::rgb(1.0, 1.0, 1.0),
-            shadows_enabled: true,
+            //color: Color::rgb(1.0, 1.0, 1.0),
+            shadows_enabled: false,
             ..default()
         },
         transform: Transform {
-            translation: Vec3::new(0.0, 2000.0, 0.0),
-            rotation: Quat::from_rotation_x(-PI / 4.),
+            translation: Vec3::new(0.0, 1.0, 0.0),
+            rotation: Quat::from_rotation_x(-PI * 0.5),
             ..default()
         },
         ..default()
     });
-
 
     // Ground plane
     commands.spawn(PbrBundle {
@@ -149,7 +148,12 @@ fn setup(
                         font_size: 20.,
                         ..default()
                     },
-                ),
+                ).with_style(Style {
+                    position_type: PositionType::Absolute,
+                    bottom: Val::Percent(50.0),
+                    right: Val::Percent(50.0),
+                    ..default()
+                }),
                 TitleText));
             parent.spawn(ImageBundle {
                 style: Style {

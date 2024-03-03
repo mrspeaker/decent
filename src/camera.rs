@@ -3,6 +3,7 @@ use bevy_atmosphere::prelude::*;
 use crate::player::Player;
 use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::render::view::ColorGrading;
+use bevy::render::camera::Exposure;
 
 #[derive(Component)]
 pub struct Camera;
@@ -24,8 +25,19 @@ impl Plugin for CameraPlugin {
 fn init_camera(mut cmds: Commands) {
     cmds.spawn((
         Camera3dBundle {
-            projection: PerspectiveProjection { far: 2000.0, ..default() }.into(),
-            tonemapping: Tonemapping::ReinhardLuminance, //Tonemapping::TonyMcMapface,
+            camera: bevy::prelude::Camera {
+                hdr: true,
+                ..default()
+            },
+            projection: PerspectiveProjection { far: 1000.0, ..default() }.into(),
+            //tonemapping: Tonemapping::ReinhardLuminance, //Tonemapping::TonyMcMapface,
+            exposure: Exposure::BLENDER,
+            color_grading: ColorGrading {
+                exposure: 0.0,
+                gamma: 1.8,
+                pre_saturation: 1.5,
+                post_saturation: 1.0,
+            },
             transform: Transform::from_xyz(
                 0.0,
                 0.0,
@@ -36,8 +48,8 @@ fn init_camera(mut cmds: Commands) {
         FogSettings {
             color: Color::rgba(0.15, 0.15, 0.15, 1.0),
             falloff: FogFalloff::Linear {
-                start: 450.0,
-                end: 800.0,
+                start: 150.0,
+                end: 500.0,
             },
             ..default()
         },

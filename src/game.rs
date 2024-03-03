@@ -8,18 +8,31 @@ const ADORNMENTS_TOTAL: u32 = 8;
 const ADORNMENTS_PER_PERSON: u32 = 3;
 const ADORNMENTS_COMBOS: u32 = 56; // 8! / (3! x (8 - 3)!)
 
+#[derive(Clone)]
+pub struct Guess {
+    pub result: u8,
+    pub outfit: [Adornment; 3]
+}
+
+#[derive(Default)]
+pub struct Scan {
+    pub entity: Option<Entity>,
+    pub time: f32
+}
+
 #[derive(Resource, Default)]
 pub struct Game {
     pub score: i32,
     pub perp: Option<u32>,
-    pub perp_outfit: Option<[Adornment; 3]>
+    pub perp_outfit: Option<[Adornment; 3]>,
+    pub guesses: Vec<Guess>,
+    pub scanning: Scan
 }
 
 #[derive(Resource, Default)]
 pub struct Outfits {
     pub outfits: Option<[[Adornment; ADORNMENTS_PER_PERSON as usize]; ADORNMENTS_COMBOS as usize]>
 }
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Adornment {
@@ -43,6 +56,10 @@ impl Adornment {
 #[derive(Event)]
 pub struct GameHitEvent(pub u32);
 
+#[derive(Event)]
+pub struct GameScanEvent(pub Guess);
+
+
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
@@ -55,7 +72,8 @@ impl Plugin for GamePlugin {
             .add_systems(Update, (
                 game_event_system,
             ))
-            .add_event::<GameHitEvent>();
+            .add_event::<GameHitEvent>()
+            .add_event::<GameScanEvent>();
     }
 }
 
@@ -93,8 +111,16 @@ fn setup_game(
 fn game_event_system(
     mut game: ResMut<Game>,
     mut ev_hit: EventReader<GameHitEvent>,
+    mut ev_scan: EventReader<GameScanEvent>,
 ) {
     for hit in ev_hit.read() {
         game.score += hit.0 as i32;
+    }
+    for scan in ev_scan.read() {
+        game.guesses.push(scan.0.clone());
+
+        for guess in game.guesses.iter() {
+            info!("{:?} {:?}", guess.result, guess.outfit);
+        }
     }
 }
