@@ -26,17 +26,17 @@ pub enum Adornment {
     FunnyHat,
     Sunnies,
     ExtraLimb,
-    Umbrella,
-    RedScarf,
+    Shopping,
+    Pole,
     FakeBeard,
     Swan,
-    FlipFlops
+    Box
 }
 
 impl Adornment {
     pub fn iter() -> impl Iterator<Item = Adornment> {
-        [FunnyHat, Sunnies, ExtraLimb, Umbrella,
-         RedScarf, FakeBeard, Swan, FlipFlops].iter().copied()
+        [FunnyHat, Sunnies, ExtraLimb, Shopping,
+         Pole, FakeBeard, Swan, Box].iter().copied()
     }
 }
 

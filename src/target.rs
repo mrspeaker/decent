@@ -7,6 +7,8 @@ use crate::player::RayHit;
 use rand::Rng;
 use crate::game::{GameHitEvent, Game, Adornment, Outfits};
 use crate::despawn::Despawn;
+use std::f32::consts::PI;
+
 pub struct TargetPlugin;
 
 #[derive(Component)]
@@ -38,16 +40,15 @@ fn setup(
 ) {
     // Floaty cube things
     let mut rng = rand::thread_rng();
-    let car_one = assets.load("renault_logan_2004.glb#Scene0");
     let car_two = assets.load("car3.glb#Scene0");
-    //let car_two = assets.load("car.glb#Scene0");
+    let car_one = assets.load("car.glb#Scene0");
 
     if let Some(o) = outfits.outfits {
         for i in 0..o.len() {
             let mut t = Transform::from_xyz(
-                rng.gen::<f32>() * 300.0 - 150.0,
-                rng.gen::<f32>() * 100.0,
-                rng.gen::<f32>() * 300.0 - 150.0
+                rng.gen::<f32>() * 150.0 - 75.0,
+                rng.gen::<f32>() * 40.0 + 20.0,
+                rng.gen::<f32>() * 150.0 - 75.0 + 50.0
             );
             t.rotate_y(i as f32 * 37.0);
 
@@ -68,55 +69,64 @@ fn setup(
                 Torque::new(),
             )).with_children(|parent| {
                 for (j, ad) in outfit.iter().enumerate() {
-                    let c = match ad {
-                        Adornment::FunnyHat => Color::rgb(0.0, 0.0, 1.0),
-                        Adornment::Sunnies => Color::rgb(0.0, 1.0, 0.0),
-                        Adornment::ExtraLimb => Color::rgb(1.0, 0.0, 0.0),
-                        Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
-                        Adornment::RedScarf => Color::rgb(1.0, 1.0, 0.0),
-                        Adornment::FakeBeard => Color::rgb(0.0, 1.0, 1.0),
-                        Adornment::Swan => Color::rgb(1.0, 1.0, 1.0),
-                        Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
-                    };
                     if *ad == Adornment::Sunnies {
                         parent.spawn(SceneBundle {
                             scene: assets.load("glasses.glb#Scene0"),
-                            transform: Transform::from_xyz(0., 2.0,3.).with_scale(Vec3::ONE * 3.0),
+                            transform: Transform::from_xyz(0., 0.9,1.8).with_scale(Vec3::ONE * 1.0),
                             ..default()
                         });
 
                     } else if *ad == Adornment::ExtraLimb {
                         parent.spawn(SceneBundle {
                             scene: assets.load("arm.glb#Scene0"),
-                            transform: Transform::from_xyz(1.5, 1.5,0.).with_scale(Vec3::ONE * 1.5),
+                            transform: Transform::from_xyz(0.5, 0.75, 0.25).with_scale(Vec3::ONE * 1.0),
                             ..default()
                         });
                     } else if *ad == Adornment::FunnyHat {
                         parent.spawn(SceneBundle {
                             scene: assets.load("hat.glb#Scene0"),
-                            transform: Transform::from_xyz(0., 2.8,0.).with_scale(Vec3::ONE * 1.5),
+                            transform: Transform::from_xyz(0., 1.5,0.).with_scale(Vec3::ONE * 1.0),
                             ..default()
                         });
                     } else if *ad == Adornment::FakeBeard {
                         parent.spawn(SceneBundle {
                             scene: assets.load("beard.glb#Scene0"),
-                            transform: Transform::from_xyz(0., 0.5,3.7).with_scale(Vec3::ONE * 4.2),
+                            transform: Transform::from_xyz(0., 0.5,1.8).with_scale(Vec3::ONE * 1.0),
                             ..default()
                         });
                     } else if *ad == Adornment::Swan {
                         parent.spawn(SceneBundle {
                             scene: assets.load("swan.glb#Scene0"),
-                            transform: Transform::from_xyz(0., 2.8,-1.5).with_scale(Vec3::ONE * 2.0),
+                            transform: Transform::from_xyz(0., 1.5,-0.5).with_scale(Vec3::ONE * 1.0),
                             ..default()
                         });
-                    } else {
-                        parent.spawn(
-                            PbrBundle {
-                                mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
-                                material: materials.add(c),
-                                transform: Transform::from_xyz(j as f32 - 1.0, 3.0, 0.0),
-                                ..default()
-                            });
+                    } else if *ad == Adornment::Pole {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("pole.glb#Scene0"),
+                            transform: Transform::from_xyz(0.0, 1.2,-1.4)
+                                .with_scale(Vec3::ONE * 1.0)
+                                .with_rotation(
+                                    Quat::from_rotation_x(-PI / 4.0)),
+                            ..default()
+                        });
+                    } else if *ad == Adornment::Box {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("box.glb#Scene0"),
+                            transform: Transform::from_xyz(0.0, 0.9,1.4)
+                                .with_scale(Vec3::ONE * 1.0)
+                                .with_rotation(
+                                    Quat::from_rotation_x(0.4)),
+                            ..default()
+                        });
+                    } else if *ad == Adornment::Shopping {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("shopping.glb#Scene0"),
+                            transform: Transform::from_xyz(-1.2, 0.4,0.0)
+                                .with_scale(Vec3::ONE * 1.0)
+                                .with_rotation(
+                                    Quat::from_rotation_x(1.0)),
+                            ..default()
+                        });
                     }
                 }
             });
@@ -137,6 +147,9 @@ fn move_targets (
 
     let mut rng = rand::thread_rng();
 
+    let torque_power = 0.05;
+    let impulse_power = 0.2;
+
     for (mut tr, t, mut imp, mut tor) in q.iter_mut() {
         let up = tr.up();
         let i = t.id as f32;
@@ -150,7 +163,7 @@ fn move_targets (
                     rng.gen::<f32>() - 0.5,
                     rng.gen::<f32>() - 0.5,
                     rng.gen::<f32>() - 0.5
-                ).normalize() * 0.4);
+                ).normalize() * impulse_power);
             }
         }
 
@@ -159,7 +172,7 @@ fn move_targets (
                 0.,
                 rng.gen::<f32>() - 0.5,
                 0.
-                    ).normalize() * 0.1);
+                    ).normalize() * torque_power);
         }
     }
 }

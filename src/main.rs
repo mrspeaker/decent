@@ -47,18 +47,13 @@ fn setup(
 ) {
     // Terrain
     commands.spawn(SceneBundle {
-        scene: assets.load("moutain2.glb#Scene0"),
-        transform: Transform::from_xyz(0.,0.,-150.).with_scale(Vec3::ONE * 1000.0),
+        scene: assets.load("mountain.glb#Scene0"),
+        transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
     commands.spawn(SceneBundle {
-        scene: assets.load("truck_town.glb#Scene0"),
-        transform: Transform::from_xyz(-20.,-0.01,0.).with_scale(Vec3::ONE * 5.0),
-        ..default()
-    });
-   commands.spawn(SceneBundle {
-        scene: assets.load("Swan.glb#Scene0"),
-        transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 10.0),
+        scene: assets.load("town.glb#Scene0"),
+        transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
 
@@ -92,7 +87,7 @@ fn setup(
 
     // Ground plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(3.5, 350.0)),
+        mesh: meshes.add(Plane3d::default().mesh().size(3.5, 3.5)),
         material: materials.add(Color::rgb(1., 0.9, 0.8)),
         transform: Transform::from_translation(Vec3::new(0., 0., 0.0)),
         ..Default::default()
@@ -105,31 +100,6 @@ fn setup(
         transform: Transform::from_xyz(0., h / 2.0, -0.5),
         ..default()
     });
-
-    let stone = materials.add(StandardMaterial {
-        base_color: Color::hex("4b3621").unwrap(),
-        perceptual_roughness: 0.8,
-        ..default()
-    });
-
-    // walls
-    for x in &[-20., 20.] {
-        commands.spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(0.5, 13.0, 150.0)),
-            material: stone.clone(),
-            transform: Transform::from_xyz(*x, 13.0/2.0, 75.0),
-            ..default()
-        });
-    }
-    // roofs
-    for y in &[-0.255, 13.0] {
-        commands.spawn(PbrBundle {
-            mesh: meshes.add(Cuboid::new(40.0, 0.5, 150.0)),
-            material: stone.clone(),
-            transform: Transform::from_xyz(0.0, *y, 75.0),
-            ..default()
-        });
-    }
 
     // point light
     commands.spawn(PointLightBundle {

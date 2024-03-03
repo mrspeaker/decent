@@ -30,7 +30,7 @@ pub struct RayHit;
 
 fn init_player(mut cmds: Commands) {
     cmds.spawn((
-        Transform::from_xyz(150.0, 70.0, 300.0)
+        Transform::from_xyz(35.0, 30.0, 150.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         Player,
         Impulse::new(),
