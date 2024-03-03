@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::despawn::Despawn;
 
 pub struct ParticlePlugin;
 
@@ -39,7 +40,7 @@ fn add_explosions(
     q: Query<(Entity, &Explosion), Added<Explosion>>)
 {
     let tex = Some(assets.load("exp1.png"));
-    let mesh = meshes.add(Rectangle::new(5.0, 5.0));
+    let mesh = meshes.add(Rectangle::new(2.0, 2.0));
     let mat = materials.add(StandardMaterial {
         base_color: Color::hex("ff2244").unwrap(),
         base_color_texture: tex,
@@ -69,9 +70,16 @@ fn add_explosions(
 
 fn update_particles(
     time: Res<Time>,
-    mut q: Query<(&mut Transform, &Particle)>
+    mut cmds: Commands,
+    mut q: Query<(Entity, &mut Transform, &Particle)>
 ) {
-    for (mut t, p) in q.iter_mut() {
-        t.translation.y += ((time.elapsed_seconds() + p.offset) * 10.).sin() * 0.1;
+    let dt = time.delta_seconds();
+    for (e, mut t, p) in q.iter_mut() {
+        let down = t.down();
+        t.translation.y += ((time.elapsed_seconds() + p.offset) * 10.).sin() * dt;
+        t.translation += down * dt * 20.0;
+        if t.translation.y < -50.0 {
+            cmds.entity(e).insert(Despawn);
+        }
     }
 }
