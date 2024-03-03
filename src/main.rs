@@ -5,6 +5,7 @@ mod laxer;
 mod particles;
 mod target;
 mod game;
+mod despawn;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
@@ -14,6 +15,7 @@ use particles::ParticlePlugin;
 use laxer::LaxerPlugin;
 use target::TargetPlugin;
 use game::GamePlugin;
+use despawn::DespawnPlugin;
 use crate::camera::TitleText;
 
 use bevy::window::{CursorGrabMode, PrimaryWindow};
@@ -23,6 +25,7 @@ fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
+            DespawnPlugin,
             CameraPlugin,
             GamePlugin,
             PlayerPlugin,
@@ -51,6 +54,11 @@ fn setup(
     commands.spawn(SceneBundle {
         scene: assets.load("truck_town.glb#Scene0"),
         transform: Transform::from_xyz(-20.,-0.01,0.).with_scale(Vec3::ONE * 5.0),
+        ..default()
+    });
+   commands.spawn(SceneBundle {
+        scene: assets.load("Swan.glb#Scene0"),
+        transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 10.0),
         ..default()
     });
 

@@ -74,7 +74,7 @@ fn setup(
                         Adornment::Umbrella => Color::rgb(1.0, 0.0, 1.0),
                         Adornment::RedScarf => Color::rgb(1.0, 1.0, 0.0),
                         Adornment::FakeBeard => Color::rgb(0.0, 1.0, 1.0),
-                        Adornment::NoShirt => Color::rgb(1.0, 1.0, 1.0),
+                        Adornment::Swan => Color::rgb(1.0, 1.0, 1.0),
                         Adornment::FlipFlops => Color::rgb(0.0, 0.0, 0.0)
                     };
                     if *ad == Adornment::Sunnies {
@@ -100,6 +100,12 @@ fn setup(
                         parent.spawn(SceneBundle {
                             scene: assets.load("beard.glb#Scene0"),
                             transform: Transform::from_xyz(0., 0.5,3.7).with_scale(Vec3::ONE * 4.2),
+                            ..default()
+                        });
+                    } else if *ad == Adornment::Swan {
+                        parent.spawn(SceneBundle {
+                            scene: assets.load("swan.glb#Scene0"),
+                            transform: Transform::from_xyz(0., 2.8,-1.5).with_scale(Vec3::ONE * 2.0),
                             ..default()
                         });
                     } else {
@@ -129,7 +135,6 @@ fn move_targets (
     let elapsed = time.elapsed_seconds();
 
     let mut rng = rand::thread_rng();
-
 
     for (mut tr, t, mut imp, mut tor) in q.iter_mut() {
         let up = tr.up();

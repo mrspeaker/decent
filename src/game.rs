@@ -29,14 +29,14 @@ pub enum Adornment {
     Umbrella,
     RedScarf,
     FakeBeard,
-    NoShirt,
+    Swan,
     FlipFlops
 }
 
 impl Adornment {
     pub fn iter() -> impl Iterator<Item = Adornment> {
         [FunnyHat, Sunnies, ExtraLimb, Umbrella,
-         RedScarf, FakeBeard, NoShirt, FlipFlops].iter().copied()
+         RedScarf, FakeBeard, Swan, FlipFlops].iter().copied()
     }
 }
 
@@ -47,7 +47,8 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Game>()
-            .init_resource::<Outfits>()
+            .init_resource::<Outfits
+                             >()
             .add_systems(PreStartup, (
                 setup_game,
             ))

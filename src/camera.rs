@@ -4,13 +4,13 @@ use crate::player::Player;
 use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::render::view::ColorGrading;
 
-pub struct CameraPlugin;
-
 #[derive(Component)]
 pub struct Camera;
 
 #[derive(Component)]
 pub struct TitleText;
+
+pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
