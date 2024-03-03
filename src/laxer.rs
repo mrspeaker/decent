@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::despawn::Despawn;
 
 pub struct LaxerPlugin;
 
@@ -81,7 +82,7 @@ fn update_laxers (
         t.translation += fwd * 400.0 * time.delta_seconds();
         l.time -= time.delta_seconds();
         if l.time <= 0.0 {
-            cmds.entity(e).despawn_recursive();
+            cmds.entity(e).insert(Despawn);
         }
     }
 }

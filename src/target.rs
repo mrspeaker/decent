@@ -6,6 +6,7 @@ use crate::particles::Explosion;
 use crate::player::RayHit;
 use rand::Rng;
 use crate::game::{GameHitEvent, Game, Adornment, Outfits};
+use crate::despawn::Despawn;
 pub struct TargetPlugin;
 
 #[derive(Component)]
@@ -172,8 +173,9 @@ fn check_collisions (
     for (le, lt) in lax.iter() {
         for (te, tt, trg) in targets.iter() {
             if lt.translation.distance(tt.translation) < 4.0 {
-                cmds.entity(te).despawn_recursive();
-                cmds.entity(le).despawn_recursive();
+                //cmds.entity(te).despawn_recursive();
+                cmds.entity(te).insert(Despawn);
+                cmds.entity(le).insert(Despawn);
                 cmds.spawn(Explosion(tt.translation));
                 ev_hit.send(GameHitEvent(2));
                 if trg.perp {
