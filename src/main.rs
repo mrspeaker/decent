@@ -7,6 +7,7 @@ mod target;
 mod game;
 mod despawn;
 mod ui;
+mod state;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
@@ -18,12 +19,14 @@ use target::TargetPlugin;
 use game::GamePlugin;
 use despawn::DespawnPlugin;
 use ui::UIPlugin;
+use state::GameState;
 
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use std::f32::consts::PI;
 
 fn main() {
     App::new()
+        .init_state::<GameState>()
         .add_plugins((
             DefaultPlugins,
             DespawnPlugin,
@@ -38,7 +41,12 @@ fn main() {
         ))
         .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, (cursor_ungrab, draw_gizmos))
+        .add_systems(OnEnter(GameState::Menu), testa)
         .run();
+}
+
+fn testa() {
+    info!("In menooo");
 }
 
 fn setup(
@@ -161,5 +169,4 @@ fn draw_gizmos(
         Transform::from_translation(Vec3::ZERO).with_scale(Vec3::splat(1.0)),
         Color::BLACK,
     );
-
 }

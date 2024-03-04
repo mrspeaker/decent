@@ -124,7 +124,7 @@ fn update_scanning(
                 } else {
                     const ANIM: [char;4] = ['/', '-', '\\' ,'|'];
                     let sec = ((time.elapsed_seconds() * 5.0) % 4.0) as usize;
-                    format!("scan {}", ANIM[sec])
+                    format!("scanning {}", ANIM[sec])
                 }
             },
             None => "".to_string()

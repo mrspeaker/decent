@@ -8,7 +8,7 @@ use crate::game::Game;
 pub struct PlayerPlugin;
 
 const SPEED: f32 = 2.0;
-const SPEED_ROLL: f32 = 5.0;
+const SPEED_ROLL: f32 = 20.0;
 const SENS: f32 = 0.005;
 
 impl Plugin for PlayerPlugin {
