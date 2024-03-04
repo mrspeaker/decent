@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::camera::TitleText;
+use crate::ui::TitleText;
 use crate::laxer::LaxerFly;
 use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
@@ -218,8 +218,9 @@ fn got_ray_hit (
                     .filter(|o| *o)
                     .count();
                 let dbg = format!("   matched: {:?}.", count);
+                // TODO: should not be doin UI here - send event?
                 txt.sections[0].value = dbg.into();
-                    // Only send once.
+                // Only send once.
                 if last <= 2.0 {
                     ev_scan.send(
                         GameScanEvent(

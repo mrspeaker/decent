@@ -6,6 +6,7 @@ mod particles;
 mod target;
 mod game;
 mod despawn;
+mod ui;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
@@ -16,7 +17,7 @@ use laxer::LaxerPlugin;
 use target::TargetPlugin;
 use game::GamePlugin;
 use despawn::DespawnPlugin;
-use crate::camera::TitleText;
+use ui::UIPlugin;
 
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use std::f32::consts::PI;
@@ -33,6 +34,7 @@ fn main() {
             TargetPlugin,
             PhysicsPlugin,
             ParticlePlugin,
+            UIPlugin,
         ))
         .add_systems(Startup, (setup, cursor_grab))
         .add_systems(Update, (cursor_ungrab, draw_gizmos))
@@ -127,72 +129,6 @@ fn setup(
             ..default()
         })
     );
-
-    // UI
-    commands
-        .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.),
-                    height: Val::Percent(100.),
-                    ..default()
-                },
-                ..default()
-            },
-        ))
-        .with_children(|parent| {
-            parent.spawn((
-                TextBundle::from_section(
-                    "...Decent",
-                    TextStyle {
-                        font_size: 20.,
-                        ..default()
-                    },
-                ).with_style(Style {
-                    position_type: PositionType::Absolute,
-                    bottom: Val::Percent(50.0),
-                    right: Val::Percent(50.0),
-                    ..default()
-                }),
-                TitleText));
-            parent.spawn(ImageBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    left: Val::Percent(46.25),
-                    top: Val::Percent(48.0),
-                    width: Val::Percent(7.5),
-                    ..default()
-                },
-                image: assets.load("sight.png").into(),
-                ..default()
-            });
-            parent.spawn(ImageBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(125.0),
-                    ..default()
-                },
-                image: assets.load("cockpit.png").into(),
-                ..default()
-            });
-
-            // Preloading particles for some reason
-            parent.spawn(ImageBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    left: Val::Percent(0.),
-                    top: Val::Percent(0.),
-                    width: Val::Percent(1.0),
-                    height: Val::Percent(1.0),
-                    ..default()
-                },
-                image: assets.load("exp1.png").into(),
-                ..default()
-            });
-
-        });
-
 
 }
 

@@ -8,14 +8,12 @@ pub struct Explosion(pub Vec3);
 
 #[derive(Component)]
 struct Particle {
-    life: f32,
     offset: f32
 }
 
 impl Particle {
     pub fn new(offset: f32) -> Self {
         Self {
-            life: 2.0,
             offset
         }
     }

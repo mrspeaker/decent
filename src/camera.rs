@@ -8,9 +8,6 @@ use bevy::render::camera::Exposure;
 #[derive(Component)]
 pub struct Camera;
 
-#[derive(Component)]
-pub struct TitleText;
-
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {

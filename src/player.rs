@@ -3,7 +3,7 @@ use bevy::input::mouse::MouseMotion;
 use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
 use bevy_mod_raycast::prelude::*;
-use crate::camera::TitleText;
+use crate::ui::TitleText;
 
 pub struct PlayerPlugin;
 
@@ -136,6 +136,7 @@ fn raycast(
         cmds.entity(root).insert(RayHit);
     } else {
         // no hit
+        // TODO: should not be doin UI here - send event?
         if let Ok(mut txt) = title.get_single_mut() {
             txt.sections[0].value = "".into();
         }
