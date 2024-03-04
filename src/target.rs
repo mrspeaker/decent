@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use crate::ui::TitleText;
 use crate::laxer::LaxerFly;
 use crate::physics::{Impulse, Torque};
 use crate::particles::Explosion;
@@ -69,38 +68,44 @@ fn setup(
                 if *ad == Adornment::Sunnies {
                     parent.spawn(SceneBundle {
                         scene: assets.load("glasses.glb#Scene0"),
-                        transform: Transform::from_xyz(0., 0.9,1.8),
+                        transform: Transform::from_xyz(0., 0.9,1.8)
+                            .with_scale(Vec3::splat(1.5)),
                         ..default()
                     });
 
                 } else if *ad == Adornment::ExtraLimb {
                     parent.spawn(SceneBundle {
                         scene: assets.load("arm.glb#Scene0"),
-                        transform: Transform::from_xyz(0.5, 0.75, 0.25),
+                        transform: Transform::from_xyz(0.5, 0.75, 0.25)
+                            .with_scale(Vec3::splat(1.5)),
                         ..default()
                     });
                 } else if *ad == Adornment::FunnyHat {
                     parent.spawn(SceneBundle {
                         scene: assets.load("hat.glb#Scene0"),
-                        transform: Transform::from_xyz(0., 1.5,0.),
+                        transform: Transform::from_xyz(0., 1.5,0.)
+                            .with_scale(Vec3::splat(1.5)),
                         ..default()
                     });
                 } else if *ad == Adornment::FakeBeard {
                     parent.spawn(SceneBundle {
                         scene: assets.load("beard.glb#Scene0"),
-                        transform: Transform::from_xyz(0., 0.5,1.8),
+                        transform: Transform::from_xyz(0., 0.5,1.8)
+                            .with_scale(Vec3::splat(1.5)),
                         ..default()
                     });
                 } else if *ad == Adornment::Swan {
                     parent.spawn(SceneBundle {
                         scene: assets.load("swan.glb#Scene0"),
-                        transform: Transform::from_xyz(0., 1.5,-0.5),
+                        transform: Transform::from_xyz(0., 1.5,-0.5)
+                            .with_scale(Vec3::splat(1.5)),
                         ..default()
                     });
                 } else if *ad == Adornment::Pole {
                     parent.spawn(SceneBundle {
                         scene: assets.load("pole.glb#Scene0"),
                         transform: Transform::from_xyz(0.0, 1.2,-1.4)
+                            .with_scale(Vec3::splat(1.5))
                             .with_rotation(Quat::from_rotation_x(-PI / 4.0)),
                         ..default()
                     });
@@ -108,6 +113,7 @@ fn setup(
                     parent.spawn(SceneBundle {
                         scene: assets.load("box.glb#Scene0"),
                         transform: Transform::from_xyz(0.0, 0.9,1.4)
+                            .with_scale(Vec3::splat(1.5))
                             .with_rotation(Quat::from_rotation_x(0.4)),
                         ..default()
                     });
@@ -115,6 +121,7 @@ fn setup(
                     parent.spawn(SceneBundle {
                         scene: assets.load("shopping.glb#Scene0"),
                         transform: Transform::from_xyz(-1.2, 0.4,0.0)
+                            .with_scale(Vec3::splat(1.5))
                             .with_rotation(Quat::from_rotation_x(1.0)),
                         ..default()
                     });
@@ -196,30 +203,27 @@ fn got_ray_hit (
     mut cmds: Commands,
     time: Res<Time>,
     q: Query<(Entity, &Target), Added<RayHit>>,
-    mut title: Query<&mut Text, With<TitleText>>,
     mut game: ResMut<Game>,
     mut ev_scan: EventWriter<GameScanEvent>
 ) {
     let Some(perp_outfit) = game.perp_outfit else { return; };
-    let Ok(mut txt) = title.get_single_mut() else { return; };
 
     for (e, t) in q.iter() {
-        txt.sections[0].value = "scanning////".into();
-
+        // TODO: should be event
+        game.scanning.active = true;
         if game.scanning.entity != Some(e)  {
+            // TODO: should be event
             game.scanning.time = 0.0;
             game.scanning.entity = Some(e);
         } else {
             let last = game.scanning.time;
+            // TODO: should be event?
             game.scanning.time += time.delta_seconds();
             if game.scanning.time > 2.0 {
                 let count = t.outfit.iter()
                     .map(|o| perp_outfit.iter().any(|&x| x == *o))
                     .filter(|o| *o)
                     .count();
-                let dbg = format!("   matched: {:?}.", count);
-                // TODO: should not be doin UI here - send event?
-                txt.sections[0].value = dbg.into();
                 // Only send once.
                 if last <= 2.0 {
                     ev_scan.send(

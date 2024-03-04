@@ -17,7 +17,8 @@ pub struct Guess {
 #[derive(Default)]
 pub struct Scan {
     pub entity: Option<Entity>,
-    pub time: f32
+    pub time: f32,
+    pub active: bool
 }
 
 #[derive(Resource, Default)]
@@ -120,7 +121,9 @@ fn game_event_system(
         game.guesses.push(scan.0.clone());
 
         for guess in game.guesses.iter() {
-            info!("{:?} {:?}", guess.result, guess.outfit);
+            if guess.result == 3 {
+                info!("you found them!");
+            }
         }
     }
 }

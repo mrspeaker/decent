@@ -3,7 +3,7 @@ use bevy::input::mouse::MouseMotion;
 use crate::physics::{Impulse, Torque, Bob};
 use crate::laxer::Laxer;
 use bevy_mod_raycast::prelude::*;
-use crate::ui::TitleText;
+use crate::game::Game;
 
 pub struct PlayerPlugin;
 
@@ -104,7 +104,7 @@ fn raycast(
     mut raycast: Raycast,
     mut q: Query<(&Transform, &mut Impulse), With<Player>>,
     parent: Query<&Parent>,
-    mut title: Query<&mut Text, With<TitleText>>,
+    mut game: ResMut<Game>
 ) {
     let Ok((t, mut i)) = q.get_single_mut() else { return; };
     let ray = Ray3d::new(
@@ -136,10 +136,8 @@ fn raycast(
         cmds.entity(root).insert(RayHit);
     } else {
         // no hit
-        // TODO: should not be doin UI here - send event?
-        if let Ok(mut txt) = title.get_single_mut() {
-            txt.sections[0].value = "".into();
-        }
+        // TODO: should be event
+        game.scanning.active = false;
 
     }
 
