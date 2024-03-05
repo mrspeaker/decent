@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 use std::f32::consts::PI;
+use crate::state::GameState;
 
 pub struct ScenePlugin;
 
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Startup, init_scene);
+            .add_systems(Startup, init_scene
+                         .run_if(in_state(GameState::Menu)));
     }
 }
 
