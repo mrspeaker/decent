@@ -61,11 +61,10 @@ fn update_player(
     for event in mouse_events.read() {
         rot.x = -event.delta.y; // Pitch
         rot.y = -event.delta.x; // Yaw
-        if rot.y.abs() > rot.x.abs() * 2.0 {
-            // NOPE: the roll accumulates, and strafes downwards
-            rot.z += rot.y * 0.5;
-            //rot.x += rot.y.abs() * 0.25;
-            //info!("{} {} {}", rot.x, rot.y, rot.z);
+        // Add some roll if yawing near the horizon
+        let a = (*t.forward()).dot(Vec3::Y).abs();
+        if a < 0.4  {
+            rot.z += rot.y * 0.8;
         }
     }
 
@@ -98,8 +97,12 @@ fn auto_level(
         return;
     };
 
+    let fwd = *t.forward();
+    if fwd.dot(Vec3::Y).abs() > 0.4 {
+        return;
+    }
     let mut roll_free = Transform::from_rotation(t.rotation);
-    roll_free.look_to(Vec3::from(t.forward()), Vec3::Y);
+    roll_free.look_to(fwd, Vec3::Y);
 
     t.rotation = t.rotation.slerp(
         roll_free.rotation,

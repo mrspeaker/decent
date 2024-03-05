@@ -72,8 +72,14 @@ fn integrate(mut q:Query<(&mut Transform, &mut Impulse, &mut Torque)>) {
         torque.vel *= 0.90; // Lol, friction
         torque.acc = Vec3::ZERO;
 
+        let a = (*t.forward()).dot(Vec3::Y).abs();
         t.rotate_local_x(torque.vel.x);
-        t.rotate_local_y(torque.vel.y);
+        if a < 0.4 {
+            t.rotate_y(torque.vel.y); // Global y to eliminate roll
+        } else {
+            t.rotate_local_y(torque.vel.y);
+        }
+
         t.rotate_local_z(torque.vel.z);
     }
 }

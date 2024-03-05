@@ -24,9 +24,16 @@ fn init_scene(
         transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
+
     commands.spawn(SceneBundle {
         scene: assets.load("town.glb#Scene0"),
         transform: Transform::from_xyz(0.,0.,0.).with_scale(Vec3::ONE * 1.0),
+        ..default()
+    });
+
+    commands.spawn(SceneBundle {
+        scene: assets.load("plane.glb#Scene0"),
+        transform: Transform::from_xyz(0.,80.,0.).with_scale(Vec3::ONE * 1.0),
         ..default()
     });
 
