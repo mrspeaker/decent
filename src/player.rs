@@ -8,8 +8,8 @@ use crate::game::Game;
 pub struct PlayerPlugin;
 
 const SPEED: f32 = 2.0;
-const SPEED_ROLL: f32 = 20.0;
-const SENS: f32 = 0.005;
+const SPEED_ROLL: f32 = 10.0;
+const SENS: f32 = 0.01;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
@@ -85,18 +85,19 @@ fn update_player(
 }
 
 fn auto_level(
-    mut gizmos: Gizmos,
-    mut q: Query<(&Transform, &mut Torque), With<Player>>
+    time: Res<Time>,
+    mut q: Query<&mut Transform, With<Player>>
 ) {
-    let Ok((t, torque)) = q.get_single_mut() else {
+    let Ok(mut t) = q.get_single_mut() else {
         return;
     };
-    let rot = t.rotation.to_euler(EulerRot::XYZ);
-    let rot2 = t.rotation.to_scaled_axis();
-    let a = t.rotation.angle_between(Quat::from_axis_angle(Vec3::Z, 0.));
-    gizmos.arrow(Vec3::ZERO, rot2, Color::YELLOW);
-    //t.rotation = t.rotation.slerp(Quat::from_axis_angle(Vec3::Z, 0.), time.delta_seconds() * 4.0);
 
+    let mut roll_free = Transform::from_rotation(t.rotation);
+    roll_free.look_to(Vec3::from(t.forward()), Vec3::Y);
+
+    t.rotation = t.rotation.slerp(
+        roll_free.rotation,
+        time.delta_seconds() * 0.8);
 }
 
 fn raycast(
