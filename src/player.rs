@@ -61,6 +61,12 @@ fn update_player(
     for event in mouse_events.read() {
         rot.x = -event.delta.y; // Pitch
         rot.y = -event.delta.x; // Yaw
+        if rot.y.abs() > rot.x.abs() * 2.0 {
+            // NOPE: the roll accumulates, and strafes downwards
+            rot.z += rot.y * 0.5;
+            //rot.x += rot.y.abs() * 0.25;
+            //info!("{} {} {}", rot.x, rot.y, rot.z);
+        }
     }
 
     if rot.length() > 0.0 {
@@ -97,7 +103,7 @@ fn auto_level(
 
     t.rotation = t.rotation.slerp(
         roll_free.rotation,
-        time.delta_seconds() * 0.8);
+        time.delta_seconds() * 1.0);
 }
 
 fn raycast(
