@@ -138,12 +138,6 @@ fn update_scanning(
     let counts = game.guesses.iter().map(|g| format!("{}", g.result)).collect::<Vec<String>>().join("   ");
     let guesstrix = Adornment::iter()
         .map(|a| {
-            let gs = game.guesses.iter()
-                .map(|g| if g.outfit.contains(&a) {
-                    "X".to_string()
-                } else {
-                    " ".to_string()
-                });
             let nom = match a {
                 Adornment::FunnyHat => "FunnyHat",
                 Adornment::Sunnies => "Sunnies",
@@ -154,10 +148,11 @@ fn update_scanning(
                 Adornment::Swan => "Swan",
                 Adornment::Box => "Box",
             };
-            format!("{:<10}: {}", nom, gs.collect::<Vec<String>>().join("   "))
+            let guess = game.guesses.iter()
+                .map(|g| if g.outfit.contains(&a) { "X" } else { " " });
+            format!("{:<10}: {}", nom, guess.collect::<Vec<_>>().join("   "))
         });
-    let lines = guesstrix
-        .collect::<Vec<String>>().join("\n");
+    let lines = guesstrix.collect::<Vec<_>>().join("\n");
     mat.sections[0].value = format!("            {}\n{}", counts, lines);
 
 }

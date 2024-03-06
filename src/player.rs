@@ -9,7 +9,7 @@ pub struct PlayerPlugin;
 
 const SPEED: f32 = 2.0;
 const SPEED_ROLL: f32 = 10.0;
-const SENS: f32 = 0.01;
+const SENS: f32 = 0.005;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
@@ -62,7 +62,7 @@ fn update_player(
         rot.x = -event.delta.y; // Pitch
         rot.y = -event.delta.x; // Yaw
         // Add some roll if yawing near the horizon
-        let a = (*t.forward()).dot(Vec3::Y).abs();
+        let a = t.forward().dot(Vec3::Y).abs();
         if a < 0.4  {
             rot.z += rot.y * 0.8;
         }
